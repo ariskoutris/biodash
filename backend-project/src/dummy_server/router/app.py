@@ -51,4 +51,11 @@ def start_server():
 
 
 if __name__ == "__main__":
+    # if os.environ("DATA_PATH"):
+    #     data_path = os.environ("DATA_PATH")
+    # else:
+    #     data_path = "/srv/data"
+    #     if not is_dir(data_path):
+    #         create_dir(data_path)
+    #         download sample data into data_path
     start_server()

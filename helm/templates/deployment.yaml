@@ -29,6 +29,8 @@ spec:
           value: {{ .Values.build.commit | quote }}
         - name: JOB_ID
           value: {{ .Values.build.job_id | quote }}
+        - name: DATA_PATH
+          value: /srv/datasets
         resources:
           limits:
             cpu: "0.5"
@@ -46,7 +48,7 @@ spec:
             readOnly: false
             volumeAttributes:
               secretName: azure-secret
-              shareName: group1
+              shareName: dummy-fullstack
 ---
 apiVersion: apps/v1
 kind: Deployment
