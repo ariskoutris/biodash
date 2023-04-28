@@ -36,6 +36,17 @@ spec:
           requests:
             cpu: "0.1"
             memory: "100M"
+        volumeMounts:
+          - name: azure-storage-input
+            mountPath: /srv/datasets
+      volumes:
+        - name: azure-storage-input
+          csi:
+            driver: file.csi.azure.com
+            readOnly: false
+            volumeAttributes:
+              secretName: azure-secret
+              shareName: group1
 ---
 apiVersion: apps/v1
 kind: Deployment
