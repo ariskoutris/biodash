@@ -28,25 +28,27 @@ Specify here the structure of you code and comment what the most important files
 ``` bash
 ├── README.md  
 ├── backend-project
-│   ├── README.md
 │   ├── setup.py   # main app
+│   ├── .dockerignore
+│   ├── Dockerfile
+│   ├── MANIFEST.in
+│   ├── README.md
 │   ├── pyproject.toml
-│   ├── src
-│   │   ├── dummy_server
-│   │   │     ├── router
-│   │   │     │    ├── routes.py
-│   │   │     │    ├── app.py
-│   │   │     │    └── __init__.py
-│   │   │     └── resources
-│   │   │         ├── scatter_data.py
-│   │   │         └── __init__.py
-│   │   └── __init__.py 
 │   ├── data
-│   │   ├── dataset_blobs.csv
-│   │   ├── dataset_circles.csv
-│   │   ├── dataset_moons.csv
-│   │   └── generate_data.py    # script to create data
-│   └── MANIFEST.in
+│   │   ├── ames-housing-features.json
+│   │   ├── ames-housing-gam-instance-data.json
+│   │   └── ames-housing-gam.json
+│   └── src/gamut_server
+│       ├── resources
+│       │   ├── __init__.py
+│       │   ├── description.py
+│       │   ├── features.py
+│       │   └── instances.py
+│       ├── router
+│       │   ├── __init__.py
+│       │   ├── app.py
+│       │   └── routes.py
+│       └── __init__.py
 ├── react-frontend
 │   ├── README.md
 │   ├── package-lock.json
@@ -56,15 +58,20 @@ Specify here the structure of you code and comment what the most important files
 │   │   ├── App.test.tsx
 │   │   ├── App.tsx
 │   │   ├── Visualization.tsx
-│   │   ├── router
-│   │   │   ├── resources
-│   │   │   │   └── data.ts
-│   │   │   └── apiClient.ts
+│   │   ├── backend
+│   │   │   ├── BackendQueryEngine.tsx
+│   │   │   └── json-decoder.ts
 │   │   ├── components
-│   │   │   ├── utils.ts
-│   │   │   ├── ScatterPlot.tsx
-│   │   │   ├── DataChoice.tsx
-│   │   │   └── ScatterPlot.css
+│   │   │   ├── BasicLineChart
+│   │   │   │   ├── BasicLineChart.scss
+│   │   │   │   ├── BasicLineChart.tsx
+│   │   │   │   └── types.ts
+│   │   │   ├── DataChoiceComponent.tsx
+│   │   │   ├── DataPointComponent.tsx
+│   │   │   └── ScatterPlot
+│   │   │       ├── ScatterPlot.scss
+│   │   │       ├── ScatterPlot.tsx
+│   │   │       └── types.ts
 │   │   ├── index.css
 │   │   ├── index.tsx
 │   │   ├── logo.svg
@@ -72,17 +79,11 @@ Specify here the structure of you code and comment what the most important files
 │   │   ├── reportWebVitals.ts
 │   │   ├── setupTests.ts
 │   │   └── types
-│   │       ├── margin.ts
-│   │       └── data.ts
-│   ├── tsconfig.json
-│   └── public
-│        ├── robot.txt
-│        ├── manifest.json
-│        ├── logo512.png
-│        ├── logo192.png
-│        ├── index.html
-│        └── favicon.ico
-└── Dockerfile
+│   │       ├── DataArray.ts
+│   │       ├── DataPoint.ts
+│   │       └── Margins.ts
+│   └── tsconfig.json
+└── requirements.txt
 ```
 
 ## Requirements
@@ -94,22 +95,24 @@ Write here **DETAILED** intructions on how to run your code.\
 **NOTE:** If we cannot run your code following these instructions we will not be able to evaluate it.
 
 As an example here are the instructions to run the Dummy Project:
-To run the dummy project you have to:
+To run the Dummy project you have to:
 - clone the repository;
-- open a new terminal instance;
-- move to the folder where the project has been downloaded using the command ```cd```;
-- open the folder called "dummy-fullstack-main";
+- open a terminal instance and using the command ```cd``` move to the folder where the project has been downloaded;
+
 To run the backend
-- open the backend folder called "backend-project";
-- create a virtual environment using the command ```conda create -n nameOfTheEnvironment```;
-- activate the virtual environment run the command ```conda activate nameOfTheEnvironment```;
-- install the requirements from the txt file using the command ```pip3 install -r requirements.txt```;
-- start the backend with the command ```python3 setup.py run```;
+- open the backend folder called "backend-project"
+- to start the backend first you need to create a virtual environment using conda
+    ```conda create -n nameOfTheEnvironment```
+  - to activate the virtual environment run the command ```conda activate nameOfTheEnvironment```
+  - install the requirements using the command ```pip3 install .```
+  - If you want to make changes and test them in real time, you can install the package in editable mode using the command```pip install -e .```
+  - to start the backend use the command ```python3 -m gamut_server.router.app``` or use the ```start-server``` command directly on your terminal
+
 To run the frontend
-- open a new terminal instance and once again go to the folder called "dummy-fullstack-main"
-- open the frontend folder called "react-frontend";
-- start the front end by using the following two commands ```npm install```, ```npm start```;
-If all the steps have been successfully executed a new browser window will open automatically.
+- Open a new terminal window and go to the project folder
+- Enter the frontend folder called "react-frontend"
+- Do the following command to start the front end ```npm install```, ```npm start```
+If all the steps have been successfully executed a new browser window witht he dummy project loaded will open automatically.
 
 ## Milestones
 Document here the major milestones of your code and future planned steps.\
