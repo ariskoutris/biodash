@@ -6,11 +6,10 @@ from sklearn.cluster import KMeans
 
 
 class DatasetResource(Resource):
-    """dataset resource."""
-    data_root = os.path.join(".", "data")
 
     def get(self, name):
-        path_name = os.path.join(self.data_root, f"dataset_{name}.csv")
+        path_name = os.path.join(os.environ["DATA_PATH"], f"dataset_{name}.csv")
+        print(path_name)
         data = pd.read_csv(path_name)
 
         # process the data, e.g. find the clusters

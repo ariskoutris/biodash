@@ -24,6 +24,12 @@ def create_app():
 
 
 def start_server():
+    if "DATA_PATH" in os.environ: #You are in deployment (this variable is crated only in the helm chart, not in the docker)
+        print("Deployment environment")
+    else: #You are in local, use local path
+         print("Local environment")
+         os.environ["DATA_PATH"] = "./data"
+
     parser = argparse.ArgumentParser()
 
     # API flag
@@ -51,10 +57,11 @@ def start_server():
 
 
 if __name__ == "__main__":
-    # if os.environ("DATA_PATH"):
-    #     data_path = os.environ("DATA_PATH")
-    # else:
-    #     data_path = "/srv/data"
+    if os.environ["DATA_PATH"]: #You are in deployment (this variable is crated only in the helm chart, not in the docker)
+        data_path = os.environ["DATA_PATH"]
+    else: #You are in local, use local path
+         print("Local environment")
+         os.environ["DATA_PATH"] = "./data"
     #     if not is_dir(data_path):
     #         create_dir(data_path)
     #         download sample data into data_path
