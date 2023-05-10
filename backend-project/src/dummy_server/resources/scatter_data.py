@@ -7,7 +7,7 @@ from sklearn.cluster import KMeans
 
 class DatasetResource(Resource):
     """dataset resource."""
-    data_root = os.path.join(".", "data")
+    data_root = os.environ["DATA_PATH"]
 
     def get(self, name):
         path_name = os.path.join(self.data_root, f"dataset_{name}.csv")

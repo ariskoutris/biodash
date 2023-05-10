@@ -29,6 +29,8 @@ spec:
           value: {{ .Values.build.commit | quote }}
         - name: JOB_ID
           value: {{ .Values.build.job_id | quote }}
+        - name: DATA_PATH
+          value: /srv/datasets
         resources:
           limits:
             cpu: "0.5"
