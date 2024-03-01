@@ -46,7 +46,7 @@ spec:
             readOnly: false
             volumeAttributes:
               secretName: azure-secret
-              shareName: group1
+              shareName: dummy-fullstack24
 ---
 apiVersion: apps/v1
 kind: Deployment
