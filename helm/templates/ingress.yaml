@@ -8,7 +8,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Release.Name }}.course-xai-iml23.isginf.ch
+  - host: {{ .Release.Name }}.course-xai-iml24.isginf.ch
     http:
       paths:
       - path: /
@@ -18,7 +18,7 @@ spec:
             name: {{ .Release.Name }}-frontend
             port:
               number: 80
-  - host: be.{{ .Release.Name }}.course-xai-iml23.isginf.ch
+  - host: be.{{ .Release.Name }}.course-xai-iml24.isginf.ch
     http:
       paths:
       - path: /
