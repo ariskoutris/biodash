@@ -24,7 +24,7 @@ a lot of time debugging)**
 ### Building
 Simply build the image with 
 ```
-DOCKER_BUILDKIT=1 docker build -t backend -f Dokerfile_local . 
+DOCKER_BUILDKIT=1 docker build -t backend -f Dockerfile_local . 
 ```
 You use the flag ```DOCKER_BUILDKIT=1``` so the Dockerfile_local get the corresponding
 .dockerignore (that does not ignore the data folder)
