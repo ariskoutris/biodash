@@ -44,3 +44,24 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Running it locally with docker 
+
+**This step is mandatory before running the CI/CD pipeline in Gitlab (it will save you
+a lot of time debugging)**
+
+### Building
+Simply build the image with 
+```
+docker build -t frontend -f Dockerfile_local . 
+```
+Dockerfile_local, uses ```npm start``` and therefore, get the correct BASE_URL in ```apiClient.ts```
+
+### Running it 
+```
+docker run -it -p 3000:3000 frontend
+```
+
+Please note that when commited to the Release branch, the CD/CI
+pipeline of Gitlab will use Dockerfile (and therefore npm serve is executed when ```docker run``` ) and
+not Dockerfile_local (npm start is executed when ```docker run``` )
