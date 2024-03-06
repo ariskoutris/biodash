@@ -4,6 +4,13 @@ import os
 from flask import Flask
 from flask_cors import CORS
 
+if "DATA_PATH" in os.environ:
+    print(
+        "You are using a docker file to build the context, DATA_PATH is defined in the helm chart")
+else:  # You are in local, use local path
+    print("Local environment")
+    os.environ["DATA_PATH"] = "./data"
+
 from dummy_server.router.routes import add_routes
 
 
@@ -24,11 +31,6 @@ def create_app():
 
 
 def start_server():
-    if "DATA_PATH" in os.environ: #You are in deployment (this variable is already crated only in the helm chart, not in the docker)
-        print("Deployment environment")
-    else: #You are in local, use local path
-         print("Local environment")
-         os.environ["DATA_PATH"] = "./data"
 
     parser = argparse.ArgumentParser()
 
