@@ -11,20 +11,6 @@ setup(
     version="0.0.1",
     description="Backend for the dummy project of the XAI-IML 2023 course.",
     long_description=read("README.md"),
-    package_data={
-        "": [
-            "dataset_blobs.csv",
-            "dataset_circles.csv",
-            "dataset_moons.csv",
-        ]
-    },
-    data_files=[(
-        "data", [
-            os.path.join("data", "dataset_blobs.csv"),
-            os.path.join("data", "dataset_circles.csv"),
-            os.path.join("data", "dataset_moons.csv"),
-        ]
-    )],
     classifiers=[
         "Intended Audience :: Developers",
         "Natural Language :: English",
