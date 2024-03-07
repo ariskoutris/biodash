@@ -28,6 +28,7 @@ build_backend:
       changes:
         paths:
           - backend-project/**/*
+    - if: $FORCE_BUILD
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -45,6 +46,7 @@ build_frontend:
       changes:
         paths:
           - react-frontend/**/*
+    - if: $FORCE_BUILD
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -78,3 +80,5 @@ deploy_app:
     --set image.tag=${CI_COMMIT_REF_NAME}
     --set build.job_id=${CI_JOB_ID}
     --set build.commit=${CI_COMMIT_SHA}
+  - >-
+    echo "frontend URL: http://$(echo ${CI_PROJECT_NAME} | tr _ -).course-xai-iml24.isginf.ch"
