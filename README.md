@@ -3,10 +3,10 @@
 [[_TOC_]]
 
 ## Team Members
-1. Team member 1
-2. Team member 2
-3. Team member 3
-4. ...
+1. Ahmad Khan
+2. Aristotelis Koutris
+3. Georgios Manos
+4. Maria Gkoulta
 
 ## Project Description 
 Describe here your project in detail and define your goals.
@@ -117,8 +117,7 @@ If all the steps have been successfully executed a new browser window witht he d
 ## Milestones
 Document here the major milestones of your code and future planned steps.\
 - [x] Week 1
-  - [x] Completed Sub-task: [#20984ec2](https://gitlab.inf.ethz.ch/COURSE-XAI-IML22/dummy-fullstack/-/commit/20984ec2197fa8dcdc50f19723e5aa234b9588a3)
-  - [x] Completed Sub-task: ...
+  - Create [pitch video](https://drive.google.com/file/d/1nu63RrAuE41CabnPYvGRDopRi_KDacI7/view).
 
 - [ ] Week 2
   - [ ] Sub-task: [#2](https://gitlab.inf.ethz.ch/COURSE-XAI-IML22/dummy-fullstack/-/issues/2)
