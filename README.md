@@ -1,6 +1,19 @@
-# Explaining Athletes Performance
 
-[[_TOC_]]
+<div align="center">
+    <header><h1>Explaining Athletes Performance</h1></header>
+    <a href="#">
+    <img src="https://img.shields.io/badge/Python-3.10-306998">
+    </a>
+    <a href="#">
+        <img src="https://img.shields.io/badge/Conda-4.12.0-44903d">
+    </a>
+    <a href="#">
+        <img src="https://img.shields.io/badge/Poetry-1.8.2-5119d4">
+    </a>
+    <br>
+    <a href="https://technogym.com"><strong>Check out Technogym »</strong></a>
+</div>
+<br>
 
 ## Team Members
 1. Ahmad Khan
