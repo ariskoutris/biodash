@@ -148,7 +148,7 @@ Then list here the weekly tags.\
 We will evaluate your code every week, based on the corresponding version.
 
 Tags:
-- Week 1: [Week 1 Tag](https://gitlab.inf.ethz.ch/COURSE-XAI-IML22/dummy-fullstack/-/tags/stable-readme)
+- Week 1: [Week 1 Tag](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/tags/v0.1.0)
 - Week 2: ..
 - Week 3: ..
 - ...
