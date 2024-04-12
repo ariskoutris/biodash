@@ -1,5 +1,6 @@
 from flask_restful import Api
-import dummy_server.resources as res
+
+from .. import resources as res
 
 API = "/api/v1/"  # optional string
 

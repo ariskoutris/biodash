@@ -1,9 +1,10 @@
-from re import S
-from sklearn import datasets
-import numpy as np
-import os
 import argparse
+import os
+from re import S
+
+import numpy as np
 import pandas as pd
+from sklearn import datasets
 
 
 def generate_data(n_samples: int, type: str, save_dir: str):

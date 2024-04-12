@@ -103,13 +103,7 @@ To run the Dummy project you have to:
 - open a terminal instance and using the command ```cd``` move to the folder where the project has been downloaded;
 
 To run the backend
-- open the backend folder called "backend-project"
-- to start the backend first you need to create a virtual environment using conda
-    ```conda create -n nameOfTheEnvironment```
-  - to activate the virtual environment run the command ```conda activate nameOfTheEnvironment```
-  - install the requirements using the command ```pip3 install .```
-  - If you want to make changes and test them in real time, you can install the package in editable mode using the command```pip install -e .```
-  - to start the backend use the command ```python3 -m gamut_server.router.app``` or use the ```start-server``` command directly on your terminal
+- Check [backend readme](backend-project/README.md) for detailed instructions.
 
 To run the frontend
 - Open a new terminal window and go to the project folder

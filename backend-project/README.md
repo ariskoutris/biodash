@@ -2,21 +2,25 @@
 
 ## Running it without docker container
 ### Installation
-You can simply install the package through [pip](https://pypi.org/project/pip/):
+First, you have to create a virtual environment using conda. You can do this by running the following command:
 
-```
-cd backend-project
-pip install .
+```bash
+conda create -n backend-project python=3.10 -y && conda activate backend-project
 ```
 
-If you want to make changes and test them in real time, you can install the package in editable mode (`-e`):
+Then, you have to activate the environment:
 
+```bash
+
+You can simply install the package through [poetry](https://python-poetry.org):
+
+```bash
+poetry install
 ```
-pip install -e .
-```
+
 
 ### How to run  
-Once the package has been installed, you can run the server by running the `start-server` command directly on your terminal, or by running `python -m dummy_server.router.app`.
+Once the package has been installed, you can run the server by running `python -m src.dummy_server.router.app`.
 
 ## Running it with docker container locally
 **This step is mandatory before running the CI/CD pipeline in Gitlab (it will save you
@@ -37,4 +41,13 @@ storage feature. Please check moodle and the branch of the repository called
 ### Running it 
 ```
 docker run -it -p 8000:8000 backend
+```
+
+### Development
+This project uses `black`, `flake8` and `isort` for code formatting and linting. You can run the following commands to check the code:
+
+```bash
+black .
+flake8 .
+isort .
 ```
