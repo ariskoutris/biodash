@@ -10,8 +10,6 @@ conda create -n backend-project python=3.10 -y && conda activate backend-project
 
 Then, you have to activate the environment:
 
-```bash
-
 You can simply install the package through [poetry](https://python-poetry.org):
 
 ```bash
