@@ -30,7 +30,7 @@ docker build . -t backend
 ```
 ### Checking that it has the right size
 ```
-docker ps -a
+docker images -a
 ```
 If it has more than 1GB you have to implement the external 
 storage feature. Please check moodle and the branch of the repository called 
