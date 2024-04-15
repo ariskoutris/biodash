@@ -1,6 +1,9 @@
-# Dummy Backend
+# Backend
 
 ## Running it without docker container
+The backend uses `conda` to create a python virtual environment, and `[poetry](https://python-poetry.org)` for package management and dependency resolution. Make sure you have them both installed locally on your machine.
+
+
 ### Installation
 First, you have to create a virtual environment using conda. You can do this by running the following command:
 
@@ -10,7 +13,7 @@ conda create -n backend-project python=3.10 -y && conda activate backend-project
 
 Then, you have to activate the environment:
 
-You can simply install the package through [poetry](https://python-poetry.org):
+You can simply install the package through `poetry`:
 
 ```bash
 poetry install
