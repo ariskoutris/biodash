@@ -9,5 +9,6 @@ def add_routes(app):
     api = Api(app)
 
     api.add_resource(res.scatter_data.DatasetResource, API + "data/<string:name>")
+    api.add_resource(res.forecast_data.ForecastResource, API + "forecast")
 
     return api
