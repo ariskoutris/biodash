@@ -130,7 +130,7 @@ Document here the major milestones of your code and future planned steps.
   - Create [pitch video](https://drive.google.com/file/d/1nu63RrAuE41CabnPYvGRDopRi_KDacI7/view).
 
 - [ ] Week 2
-  - [ ] [Frontend Sketch: #1](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/1)
+  - [x] [Frontend Sketch](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/1): Create [sketch](https://www.figma.com/file/t3EVcrbK2uShNufGNmHsFX/xai?type=design&node-id=0%3A1&mode=design&t=0RMKaucwJU1ca0k5-1).
   - [ ] [Data Preprocessing: #2](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/2)
   - [ ] [Model: #3](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/3)
   - [ ] [Endpoints: #4](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/4)
