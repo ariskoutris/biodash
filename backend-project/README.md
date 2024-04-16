@@ -1,7 +1,7 @@
 # Backend
 
 ## Running it without docker container
-The backend uses `conda` to create a python virtual environment, and `[poetry](https://python-poetry.org)` for package management and dependency resolution. Make sure you have them both installed locally on your machine.
+The backend uses `conda` to create a python virtual environment, and [`poetry`](https://python-poetry.org) for package management and dependency resolution. Make sure you have them both installed locally on your machine.
 
 
 ### Installation
