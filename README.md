@@ -129,11 +129,11 @@ Document here the major milestones of your code and future planned steps.
 - [x] Week 1
   - Create [pitch video](https://drive.google.com/file/d/1nu63RrAuE41CabnPYvGRDopRi_KDacI7/view).
 
-- [ ] Week 2
+- [x] Week 2
   - [x] [Frontend Sketch](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/1): Create [sketch](https://www.figma.com/file/t3EVcrbK2uShNufGNmHsFX/xai?type=design&node-id=0%3A1&mode=design&t=0RMKaucwJU1ca0k5-1).
-  - [ ] [Data Preprocessing: #2](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/2)
-  - [ ] [Model: #3](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/3)
-  - [ ] [Endpoints: #4](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/4)
+  - [x] [Data Preprocessing: #2](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/2)
+  - [x] [Model: #3](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/3)
+  - [x] [Endpoints: #4](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/4)
 
 Create a list subtask.\
 Open an issue for each subtask. Once you create a subtask, link the corresponding issue.\
@@ -156,7 +156,7 @@ We will evaluate your code every week, based on the corresponding version.
 
 Tags:
 - Week 1: [Week 1 Tag](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/tags/v0.1.0)
-- Week 2: ..
+- Week 2: [Week 2 Tag](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/tags/v0.2.0)
 - Week 3: ..
 - ...
 
