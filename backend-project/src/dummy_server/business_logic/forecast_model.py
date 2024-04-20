@@ -1,6 +1,8 @@
 import os
 
 from joblib import dump, load
+
+
 class ForecastModel:
     """
     Class to handle forecast models for all target types

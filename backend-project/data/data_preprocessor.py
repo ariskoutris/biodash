@@ -1,13 +1,21 @@
-import pandas as pd
 import os
-from typing import Union, Optional
+from typing import Optional, Union
+
+import pandas as pd
 
 
 class DataPreprocessor:
     """
     Data Preprocessor class to preprocess the data before training the model.
     """
-    def __init__(self, workout_data_path: Union[str, os.PathLike], timeseries_data_path: Union[str, os.PathLike], targets_path: Union[str, os.PathLike], legend_path: Union[str, os.PathLike, None] = None):
+
+    def __init__(
+        self,
+        workout_data_path: Union[str, os.PathLike],
+        timeseries_data_path: Union[str, os.PathLike],
+        targets_path: Union[str, os.PathLike],
+        legend_path: Union[str, os.PathLike, None] = None,
+    ):
         """
         Initialize the DataPreprocessor class.
         :param workout_data_path: File path to the workout data.
