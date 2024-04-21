@@ -7,3 +7,6 @@ from .exercise import ExerciseSchema
 class UserSchema(Schema):
     biometric_data = fields.Nested(BiometricDataSchema)
     training_data = fields.List(fields.Nested(ExerciseSchema))
+    
+    #TODO: Aggregate raw training data (e.g. workouts per week, calories per workout, etc.)
+    # agg_training_data = fields.Dict()

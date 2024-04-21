@@ -1,0 +1,50 @@
+{
+    "biometric_data": {
+        "weight": 70.0,
+        "muscle_mass_perc": 55.0,
+        "fat_mass_perc": 45.0,
+        "fitness_age": 30
+    },
+    "training_data": [
+        {
+            "exercise": "GOAL exercise in time",
+            "equipment": "Synchro",
+            "date": "2024-04-03",
+            "duration": 900,
+            "calories": 163,
+            "mets_min": 7.1
+        },
+        {
+            "exercise": "Quick Start",
+            "equipment": "Synchro Excite Compact",
+            "date": "2024-04-03",
+            "duration": 892,
+            "calories": 125,
+            "mets_min": 6.1
+        },
+        {
+            "exercise": "Calf raise",
+            "equipment": "Barbell",
+            "date": "2024-04-03",
+            "duration": 360,
+            "calories": 65,
+            "mets_min": 7.0
+        },
+        {
+            "exercise": "Back extension",
+            "equipment": "Lower Back Sel",
+            "date": "2024-04-03",
+            "duration": 287,
+            "calories": 28,
+            "mets_min": 3.8
+        },
+        {
+            "exercise": "Crunch",
+            "equipment": "Abdominal Crunch Sel",
+            "date": "2024-04-03",
+            "duration": 324,
+            "calories": 28,
+            "mets_min": 3.3
+        }
+    ]
+}
