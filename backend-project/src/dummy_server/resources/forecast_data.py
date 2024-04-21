@@ -1,44 +1,76 @@
 from flask import request
 from flask_restful import Resource
 from marshmallow import ValidationError
-import random
 import json
 
-from ..schemas import BiometricDataSchema, UserSchema
-
-
-class ForecastResource(Resource):
+from ..schemas import UserSchema
+from ..models.biometrics_prediction import BiometricsPredictor
+ 
+class PredictionsResource(Resource):
     """
-    Endpoint to predict biometric data
+    Receives user data and returns a unique identifier for later retrieval.
     """
-
-    def get(self, id, duration):
-        # Generate random data for demonstration
-        data = {
-            'id': id,
-            'duration': duration,
-            'Weight': random.uniform(50.0, 100.0),  # Random weight between 50 and 100 kg
-            'Fat Mass': random.uniform(5.0, 25.0),  # Random fat mass percentage
-            'Muscle Mass': random.uniform(30.0, 60.0),  # Random muscle mass percentage
-            'Fitness Age': random.randint(20, 60)  # Random fitness age between 20 and 60
-        }
-        return data, 200  # Return the data and HTTP status 200 (OK)
-
-
     def post(self):
-        """
-        Predicts the biometric data for the given training data
-        and current biometric data
-        :return: Predicted biometric data
-        """
         json_data = request.get_json()
-        print(json.dumps(json_data, indent=4))
         try:
-            # Load and validate JSON data against the schema
             user_data = UserSchema().load(json_data)
         except ValidationError as err:
             return {"message": "Validation error", "errors": err.messages}, 400
 
-        # TODO: Implement the prediction logic
+        # Save data and generate a user ID
+        user_id = BiometricsPredictor.save_user_data(user_data)
+        return {"user_id": user_id}, 201
 
-        return BiometricDataSchema().dump(user_data["biometric_data"]), 200
+class RadarChartResource(Resource):
+    """
+    Uses a user ID to retrieve and process user data for radar chart visualization.
+    """
+    def get(self, user_id, period):
+        try:
+            user_data = BiometricsPredictor.get_user_data(user_id)
+        except KeyError:
+            return {"message": "Invalid user ID"}, 404
+           
+        current_metrics = BiometricsPredictor.get_current_metrics(user_data)
+        predicted_metrics = BiometricsPredictor.predict_all_metrics(user_data, period) 
+        radar_data = {
+            "current": current_metrics,
+            "predicted": predicted_metrics
+        }
+        return radar_data, 200
+    
+class LineChartResource(Resource):
+    """
+    Uses a user ID to retrieve user data and generate line chart data for a specified metric and period.
+    """
+    def get(self, user_id, metric, period):
+        try:
+            user_data = BiometricsPredictor.get_user_data(user_id)
+        except KeyError:
+            return {"message": "Invalid user ID"}, 404
+
+        time_series_prediction = BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
+        line_chart_data = {
+            "metric": metric,
+            "period": period,
+            "time_series": time_series_prediction
+        }
+        return line_chart_data, 200
+
+class FeatureImportanceResource(Resource):
+    """
+    Uses a user ID to retrieve user data and generate feature importance data for a specified metric.
+    """
+    def get(self, user_id, metric, period):
+        try:
+            user_data = BiometricsPredictor.get_user_data(user_id)
+            importances = BiometricsPredictor.calculate_feature_importances(user_data, metric, period)
+        except KeyError:
+            return {"message": "Invalid user ID"}, 404
+
+        feature_importance_data = {
+            "metric": metric,
+            "period": period,
+            "importances": importances
+        }
+        return feature_importance_data, 200

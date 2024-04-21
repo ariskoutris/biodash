@@ -2,7 +2,9 @@ from marshmallow import Schema, fields
 
 
 class ExerciseSchema(Schema):
-    equipment_name = fields.String()
+    exercise = fields.String()
+    equipment = fields.String()
+    date = fields.Date()
     duration = fields.Integer()
     calories = fields.Integer()
     mets_min = fields.Float()
