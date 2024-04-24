@@ -65,3 +65,8 @@ docker run -it -p 3000:3000 frontend
 Please note that when commited to the Release branch, the CD/CI
 pipeline of Gitlab will use Dockerfile (and therefore npm serve is executed when ```docker run``` ) and
 not Dockerfile_local (npm start is executed when ```docker run``` )
+
+
+## Contributing
+
+The project uses [react-chartjs-2](https://react-chartjs-2.js.org/examples) for the charts. Checkout their documentation for details.
