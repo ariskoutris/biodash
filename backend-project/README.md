@@ -28,11 +28,11 @@ Once the package has been installed, you can run the server by running `python -
 a lot of time debugging)**
 ### Building
 Simply build the image with 
-```
+```bash
 docker build . -t backend 
 ```
 ### Checking that it has the right size
-```
+```bash
 docker images -a
 ```
 If it has more than 1GB you have to implement the external 
@@ -40,7 +40,7 @@ storage feature. Please check moodle and the branch of the repository called
 ```add-more-storage```
 
 ### Running it 
-```
+```bash
 docker run -it -p 8000:8000 backend
 ```
 
