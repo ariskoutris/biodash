@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { Button } from './components/button/buttons';
 import { postPoints, sendData } from './router/resources/data';
 import { get } from 'http';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 //
 function App() {
 
