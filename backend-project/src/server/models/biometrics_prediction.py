@@ -31,12 +31,12 @@ class BiometricsPredictor:
         Compute current metrics from user data.
         """
         # Placeholder for current user metrics calculation
-        return {
-            "Weight": user_data["biometric_data"]["weight"],
-            "Muscle Mass Perc": user_data["biometric_data"]["muscle_mass_perc"],
-            "Fat Mass Perc": user_data["biometric_data"]["fat_mass_perc"],
-            "Fitness Age": user_data["biometric_data"]["fitness_age"],
+        biometric_data = user_data.get("biometric_data", {})
+        response = {
+            key.replace("_", " ").title(): value
+            for key, value in biometric_data.items()
         }
+        return response
 
     @staticmethod
     def predict_all_metrics(user_data, period):
@@ -44,15 +44,23 @@ class BiometricsPredictor:
         Predict all metrics for the given period based on user data.
         """
         # Placeholder for prediction logic using user data and time period
-        return {
-            "Weight": user_data["biometric_data"]["weight"] * random.uniform(0.9, 1.1),
-            "Muscle Mass Perc": user_data["biometric_data"]["muscle_mass_perc"]
-            * random.uniform(0.9, 1.1),
-            "Fat Mass Perc": user_data["biometric_data"]["fat_mass_perc"]
-            * random.uniform(0.9, 1.1),
-            "Fitness Age": user_data["biometric_data"]["fitness_age"]
-            + random.randint(-5, 5),
-        }
+        biometric_data = user_data.get("biometric_data", {})
+        response = {}
+        if "weight" in biometric_data:
+            response["Weight"] = biometric_data["weight"] * random.uniform(0.9, 1.1)
+        if "muscle_mass_perc" in biometric_data:
+            response["Muscle Mass Perc"] = biometric_data[
+                "muscle_mass_perc"
+            ] * random.uniform(0.9, 1.1)
+        if "fat_mass_perc" in biometric_data:
+            response["Fat Mass Perc"] = biometric_data[
+                "fat_mass_perc"
+            ] * random.uniform(0.9, 1.1)
+        if "fitness_age" in biometric_data:
+            response["Fitness Age"] = biometric_data["fitness_age"] + random.randint(
+                -5, 5
+            )
+        return response
 
     @staticmethod
     def predict_metric_over_time(user_data, metric, period):
