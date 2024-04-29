@@ -21,7 +21,7 @@ poetry install
 
 
 ### How to run  
-Once the package has been installed, you can run the server by running `python -m src.dummy_server.router.app`.
+Once the package has been installed, you can run the server by running `python -m src.server.router.app`.
 
 ## Running it with docker container locally
 **This step is mandatory before running the CI/CD pipeline in Gitlab (it will save you

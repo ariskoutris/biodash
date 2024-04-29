@@ -1,9 +1,9 @@
-from uuid import uuid4
 import json
-
 import random
+from uuid import uuid4
 
 _data_store = {}
+
 
 class BiometricsPredictor:
     @staticmethod
@@ -32,10 +32,10 @@ class BiometricsPredictor:
         """
         # Placeholder for current user metrics calculation
         return {
-            'Weight': user_data['biometric_data']["weight"],
-            'Muscle Mass Perc': user_data['biometric_data']["muscle_mass_perc"],
-            'Fat Mass Perc': user_data['biometric_data']["fat_mass_perc"],
-            'Fitness Age': user_data['biometric_data']["fitness_age"]
+            "Weight": user_data["biometric_data"]["weight"],
+            "Muscle Mass Perc": user_data["biometric_data"]["muscle_mass_perc"],
+            "Fat Mass Perc": user_data["biometric_data"]["fat_mass_perc"],
+            "Fitness Age": user_data["biometric_data"]["fitness_age"],
         }
 
     @staticmethod
@@ -45,10 +45,13 @@ class BiometricsPredictor:
         """
         # Placeholder for prediction logic using user data and time period
         return {
-            "Weight": user_data['biometric_data']["weight"] * random.uniform(0.9, 1.1),
-            "Muscle Mass Perc": user_data['biometric_data']["muscle_mass_perc"] * random.uniform(0.9, 1.1),
-            "Fat Mass Perc": user_data['biometric_data']["fat_mass_perc"] * random.uniform(0.9, 1.1),
-            "Fitness Age": user_data['biometric_data']["fitness_age"] + random.randint(-5, 5),
+            "Weight": user_data["biometric_data"]["weight"] * random.uniform(0.9, 1.1),
+            "Muscle Mass Perc": user_data["biometric_data"]["muscle_mass_perc"]
+            * random.uniform(0.9, 1.1),
+            "Fat Mass Perc": user_data["biometric_data"]["fat_mass_perc"]
+            * random.uniform(0.9, 1.1),
+            "Fitness Age": user_data["biometric_data"]["fitness_age"]
+            + random.randint(-5, 5),
         }
 
     @staticmethod
@@ -57,10 +60,13 @@ class BiometricsPredictor:
         Predict the values of a specific metric over the specified time period.
         """
         # Simulating a time series prediction
-        return [{
-            "time": month,
-            "value": user_data['biometric_data'][metric] * random.uniform(0.9, 1.1)
-        } for month in range(1, period + 1)]
+        return [
+            {
+                "time": month,
+                "value": user_data["biometric_data"][metric] * random.uniform(0.9, 1.1),
+            }
+            for month in range(1, period + 1)
+        ]
 
     @staticmethod
     def calculate_feature_importances(user_data, metric, period):
@@ -70,5 +76,5 @@ class BiometricsPredictor:
         # Placeholder logic for calculating feature importances
         return {
             "Workouts per Week": random.uniform(0.1, 0.5),
-            "Calories per Workout": random.uniform(0.1, 0.5)
+            "Calories per Workout": random.uniform(0.1, 0.5),
         }
