@@ -11,7 +11,7 @@ import { Recommendataions } from "../../components/Recommendations";
 export const MainPage = ({ data }) => {
   const [readyData, setReadyData] = useState();
   const [period, setPeriod] = useState(3); // in months
-  const [target, setTarget] = useState(null);
+  const [target, setTarget] = useState("weight");
 
   useEffect(() => {
     setReadyData(data);
@@ -64,13 +64,13 @@ export const MainPage = ({ data }) => {
             }}
             className="boxBodyRow"
           >
-            <Form.Select size="sm" onChange={onTimePeriodSelected}>
+            <Form.Select size="sm" onChange={onTimePeriodSelected} defaultValue={3}>
               <option value={null}>Select period</option>
               <option value={3}>3 months</option>
               <option value={6}>6 months</option>
               <option value={12}>12 months</option>
             </Form.Select>
-            <Form.Select size="sm" onChange={onTargetSelected}>
+            <Form.Select size="sm" onChange={onTargetSelected} defaultValue={"weight"}>
               <option value={null}>Select target</option>
               <option value={"weight"}>Weight</option>
               <option value={"fitness_age"}>Age</option>
