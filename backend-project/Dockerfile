@@ -35,4 +35,4 @@ RUN poetry install --no-dev
 COPY . /srv/backend-app
 
 # Command to run your application
-CMD ["python", "-m", "src.dummy_server.router.app", "--host", "0.0.0.0"]
+CMD ["python", "-m", "src.server.router.app", "--host", "0.0.0.0"]

@@ -8,7 +8,7 @@ def read(fname):
 
 
 setup(
-    name="dummy_server",
+    name="server",
     version="0.0.1",
     description="Backend for the dummy project of the XAI-IML 2023 course.",
     long_description=read("README.md"),
@@ -21,7 +21,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "start-server = dummy_server.router.app:start_server",
+            "start-server = server.router.app:start_server",
         ]
     },
     install_requires=[
@@ -31,6 +31,6 @@ setup(
         "pandas>=1.4.1,<1.5",
         "scikit-learn>=1.0.2,<1.1",
     ],
-    packages=find_packages(where="src", include=["dummy_server*"]),
+    packages=find_packages(where="src", include=["server*"]),
     package_dir={"": "src"},
 )
