@@ -1,12 +1,10 @@
-import './App.css';
+import './App.scss';
 import { MainPage } from './pages/mainPage/mainPage';
 import { useEffect, useState } from 'react';
-import { Button } from './components/button/buttons';
+import Button from 'react-bootstrap/Button';
 import { postPoints, sendData } from './router/resources/data';
-import { get } from 'http';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
-//
+
 function App() {
 
   const [data, setData] = useState<any>(false) ;
@@ -18,12 +16,6 @@ function App() {
   // TODO: Set default values for target biometric and duration here
 
   // here fetch and set the data 
-  const _onClickmoons = async (e : any) => {
-    const _data = await postPoints('data/moons')
-    console.log(_data)
-    setData(_data || true)
-  }
-
   const getRadar = async (e : any) => {
     const _data = await postPoints(`radar/${e.user_id}/5`);
     console.log(_data)
@@ -81,11 +73,13 @@ function App() {
     <div className="App">
       <div className='headerContainer'>
       <div className='headerContainerItem'>
-        <img className='headerContainerItem' src={require('./components/assets/technogym_logo_vector.png')}/> 
+        <img className='headerContainerItem' src={require('./assets/technogym_logo_vector.png')}/> 
         </div>
         <header className="App-header"> TechnoGym Assistant </header>
         <div className='headerContainerItem'>
-          <Button onClick={_onImportClick} content={'Import Data'}/> 
+          <Button onClick={_onImportClick}>
+            Import Data
+          </Button> 
         </div>
 
       </div>

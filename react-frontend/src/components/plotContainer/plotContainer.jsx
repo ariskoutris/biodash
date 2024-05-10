@@ -1,4 +1,4 @@
-import "./plotContainer.css"
+import "./plotContainer.scss"
 
 export const PlotContainer = ({title = '' , content = null, width = "100%" , height = "100%"}) =>{
     return <div className="plotContainer" style={{width , height}}> 

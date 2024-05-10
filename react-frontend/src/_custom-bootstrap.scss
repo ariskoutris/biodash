@@ -1,0 +1,9 @@
+@import './colors.module.scss';
+@import '~bootstrap/scss/bootstrap.scss';
+
+// Define Bootstrap Overrides here
+.btn {
+  padding: 10px 20px;
+  font-weight: bold;
+  border: 1px solid black;
+}
