@@ -1,4 +1,3 @@
-import './RadarChart.css'
 import {
   Chart as ChartJS,
   RadialLinearScale,
@@ -9,6 +8,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Radar } from 'react-chartjs-2';
+import colors from '../../colors.module.scss';
 
 ChartJS.register(
   RadialLinearScale,
@@ -21,6 +21,7 @@ ChartJS.register(
 
 
 const RadarChart = ({data, target_hook}) => {
+  console.log(colors)
   const labels = Object.keys(data.current);
   const currentValues = Object.values(data.current);
   const predictedValues = Object.values(data.predicted);
@@ -30,15 +31,15 @@ const RadarChart = ({data, target_hook}) => {
       {
         label: 'Current',
         data: currentValues,
-        backgroundColor: 'rgba(132, 99, 255, 0.2)',
-        borderColor: 'rgba(132, 99, 255, 1)',
+        backgroundColor: colors.currentPlotColorLight,
+        borderColor: colors.currentPlotColor,
         borderWidth: 1,
       },
       {
         label: 'Predicted',
         data: predictedValues,
-        backgroundColor: 'rgba(255, 204, 0, 0.2)',
-        borderColor: 'rgba(255, 204, 0, 1)',
+        backgroundColor: colors.predictedPlotColorLight,
+        borderColor: colors.predictedPlotColor,
         borderWidth: 1,
       },
     ],

@@ -1,12 +1,9 @@
-import "./mainPage.css";
-import Form from "react-bootstrap/Form";
-
 import { useEffect, useState } from "react";
 import { PlotContainer } from "../../components/plotContainer/plotContainer";
 import RadarChart from "../../components/plotContainer/RadarChart";
 import ForecastPlot from "../../components/plotContainer/ForecastPlot";
 import HorizontalBarPlot from "../../components/plotContainer/HorizontalBarPlot";
-import { Recommendataions } from "../../components/Recommendations";
+import { InteractionsContainer } from "../../components/InteractionsContainer";
 
 export const MainPage = ({ data }) => {
   const [readyData, setReadyData] = useState();
@@ -15,6 +12,7 @@ export const MainPage = ({ data }) => {
 
   useEffect(() => {
     setReadyData(data);
+    console.log(data)
   }, [data]);
 
   const onTimePeriodSelected = (e) => {
@@ -41,6 +39,11 @@ export const MainPage = ({ data }) => {
     // keep what was pressed
   };
 
+  const getCurrentProjectedTarget = (data) => {
+    const lineTS = data.line.time_series;
+    return Math.round(lineTS[lineTS.length - 1]["value"]);
+  }
+
   // if data not ready yet return empty
   if (!readyData) return <> </>;
 
@@ -53,61 +56,40 @@ export const MainPage = ({ data }) => {
   // otherwise build body
   return (
     <div className="boxBody">
-      <div style={{ gap: "50px" }} className="boxBodyRow">
-        <div className="boxBodyColumn">
-          {/*  add row with 2 dropdown menu, one for time period and one for target metric */}
-          <div
-            style={{
-              justifyContent: "center",
-              gap: "20px",
-              paddingBottom: "20px",
-            }}
-            className="boxBodyRow"
-          >
-            <Form.Select size="sm" onChange={onTimePeriodSelected} defaultValue={3}>
-              <option value={null}>Select period</option>
-              <option value={3}>3 months</option>
-              <option value={6}>6 months</option>
-              <option value={12}>12 months</option>
-            </Form.Select>
-            <Form.Select size="sm" onChange={onTargetSelected} defaultValue={"weight"}>
-              <option value={null}>Select target</option>
-              <option value={"weight"}>Weight</option>
-              <option value={"fitness_age"}>Age</option>
-              <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
-              <option value={"fat_mass_perc"}>Fat Mass Percentage</option>
-            </Form.Select>
+      <div className="boxBodyColumn">
+        <InteractionsContainer 
+          data={data} 
+          target={target}
+          currentProjectedTarget={getCurrentProjectedTarget(data)}
+          onTimePeriodSelected={onTimePeriodSelected}
+          onTargetSelected={onTargetSelected}
+        />
+        <div className="boxBodyRow">
+          <div className="boxBodyColumn">
+            <PlotContainer
+              key="RadarPlot"
+              title="Bio-Measurements"
+              content={radarChart}
+              height={size}
+              width={size}
+            />
           </div>
-          <PlotContainer
-            key="RadarPlot"
-            title="Bio-Measurements"
-            content={radarChart}
-            height={size}
-            width={size}
-          />
-          <Recommendataions 
-            data={data}
-            target={target}
-          />
-        </div>
-        <div
-          style={{ justifyContent: "center", gap: "40px" }}
-          className="boxBodyColumn"
-        >
-          <PlotContainer
-            key="ForecastPlot"
-            title="Forecast"
-            content={forecastPlot}
-            height={size}
-            width={size}
-          />
-          <PlotContainer
-            key="BarPlot"
-            title="Feature importance"
-            content={barPlot}
-            height={size}
-            width={size}
-          />
+          <div className="boxBodyColumn">
+            <PlotContainer
+              key="ForecastPlot"
+              title="Forecast"
+              content={forecastPlot}
+              height={size}
+              width={size}
+            />
+            <PlotContainer
+              key="BarPlot"
+              title="Feature importance"
+              content={barPlot}
+              height={size}
+              width={size}
+            />
+          </div>
         </div>
       </div>
     </div>

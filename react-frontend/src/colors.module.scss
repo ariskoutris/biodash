@@ -1,0 +1,23 @@
+// Define Custom Colors here
+$current-plot-color: rgba(255, 204, 0, 1);
+$current-plot-color-light:  rgba(255, 204, 0, 0.2);
+
+$predicted-plot-color: rgba(132, 99, 255, 1);
+$predicted-plot-color-light: rgba(132, 99, 255, 0.2);
+
+// $recommended-plot-color: #fada48;
+// $recommended-plot-color-light: #fada48;
+
+// Define Bootstrap Variables here
+$primary: #fada48;
+// $secondary: #your-secondary-color;
+
+// export vars
+:export {
+  currentPlotColor: $current-plot-color;
+  currentPlotColorLight: $current-plot-color-light;
+  predictedPlotColor: $predicted-plot-color;
+  predictedPlotColorLight: $predicted-plot-color-light;
+  primary: $primary;
+  // secondary: $secondary;
+}

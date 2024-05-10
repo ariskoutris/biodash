@@ -1,5 +1,3 @@
-import React from 'react';
-import './ForecastPlot.css'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,6 +9,7 @@ import {
   Legend,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import colors from '../../colors.module.scss';
 
 ChartJS.register(
   CategoryScale,
@@ -44,8 +43,8 @@ const ForecastPlot = ({data}) => {
           {
             // label: 'Dataset 1',
             data: values,
-            borderColor: 'rgb(255, 99, 132)',
-            backgroundColor: 'rgba(255, 99, 132, 0.5)',
+            borderColor: colors.currentPlotColor,
+            backgroundColor: colors.currentPlotColorLight,
           },
         ],
       };

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -9,6 +8,9 @@ import {
     Legend,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
+import colors from '../../colors.module.scss';
+
+
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -45,8 +47,8 @@ const HorizontalBarPlot = ({data}) => {
         {
           // label: 'Dataset 1',
           data: importances,
-          borderColor: 'rgb(255, 99, 132)',
-          backgroundColor: 'rgba(255, 99, 132, 0.5)',
+          borderColor: colors.currentPlotColor,
+          backgroundColor: colors.currentPlotColorLight,
         },
       ],
     };
