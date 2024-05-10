@@ -8,6 +8,7 @@ const target_to_string = {
   body_fat_perc: "Body Fat %",
   muscle_mass_perc: "Muscle Mass %",
   fitness_age: "Fitness Age",
+  fat_mass_perc: "Fat Mass %",
 };
 
 export const InteractionsContainer = ({
