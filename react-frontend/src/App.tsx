@@ -1,31 +1,89 @@
+import './App.scss';
+import { MainPage } from './pages/mainPage/mainPage';
 import { useEffect, useState } from 'react';
-import './App.css';
-import { DataArray } from './types/data';
-import DataChoiceComponent from './components/DataChoice';
-import ScatterPlot from './components/ScatterPlot';
-import { postPoints } from './router/resources/data';
+import Button from 'react-bootstrap/Button';
+import { postPoints, sendData } from './router/resources/data';
+
 
 function App() {
 
-  const [exampleData, setExampleData] = useState<DataArray>();
-  const [dataChoice, setDataChoice] = useState<string>();
+  const [data, setData] = useState<any>(false) ;
+  const [radarData, setRadarData] = useState<any>(false) ;
+  const [lineData, setLineData] = useState<any>(false) ;
+  const [barData, setBarData] = useState<any>(false) ;
+  const [user, setUser] = useState<any>(false) ;
 
-  useEffect(() => {
-    dataChoice && postPoints(dataChoice).then(exampleData => {
-      setExampleData(exampleData);
-    });
-  }, [dataChoice]);
+  // TODO: Set default values for target biometric and duration here
 
-  function choiceMade(choice: string) {
-    setDataChoice(choice);
+  // here fetch and set the data 
+  const getRadar = async (e : any) => {
+    const _data = await postPoints(`radar/${e.user_id}/5`);
+    console.log(_data)
+    setRadarData(_data || true)
   }
+
+  // TODO: Add target and duration parameters as arguments
+  const getLine = async (e : any) => {
+    const _data = await postPoints(`line/${e.user_id}/weight/5`);
+    console.log(_data)
+    setLineData(_data || true)
+  }
+
+  // TODO: Add target and duration parameters as arguments
+  const getBar = async (e : any) => {
+    const _data = await postPoints(`features/${e.user_id}/weight/5`);
+    console.log(_data)
+    setBarData(_data || true)
+  }
+
+
+    // here fetch and set the data 
+    const _onImportClick = async (e : any) => {
+      e.stopPropagation()
+      const _id = await sendData('import')
+      setUser(_id || true)
+    }
+
+
+  // Effect to fetch user details when `user` is updated
+  useEffect(() => {
+    console.log(user.user_id)
+    if (user) {
+      getRadar(user)
+      getLine(user)
+      getBar(user)
+    }
+  }, [user]);
+
+
+  // Effect to fetch user details when `user` is updated
+  useEffect(() => {
+    if (radarData && lineData && barData) {
+      setData({
+        radar: radarData,
+        line: lineData,
+        bar: barData
+      })
+    }
+  }, [radarData, lineData, barData]);
+
+
 
   return (
     <div className="App">
-      <header className="App-header"> K-Means clustering
-      </header>
-      <DataChoiceComponent onChoiceMade={choiceMade} />
-      <ScatterPlot width={1100} height={550} data={exampleData} />
+      <div className='headerContainer'>
+      <div className='headerContainerItem'>
+        <img className='headerContainerItem' src={require('./assets/technogym_logo_vector.png')}/> 
+        </div>
+        <header className="App-header"> TechnoGym Assistant </header>
+        <div className='headerContainerItem'>
+          <Button onClick={_onImportClick}>
+            Import Data
+          </Button> 
+        </div>
+
+      </div>
+      <MainPage data={data}/>
     </div>
   )
 }

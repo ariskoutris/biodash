@@ -1,25 +1,41 @@
-# Project Title
 
-[[_TOC_]]
+<div align="center">
+    <header><h1>Explaining Athletes Performance</h1></header>
+    <a href="#">
+    <img src="https://img.shields.io/badge/Python-3.10-306998">
+    </a>
+    <a href="#">
+        <img src="https://img.shields.io/badge/Conda-4.12.0-44903d">
+    </a>
+    <a href="#">
+        <img src="https://img.shields.io/badge/Poetry-1.8.2-5119d4">
+    </a>
+    <br>
+    <a href="https://technogym.com"><strong>Check out Technogym »</strong></a>
+</div>
+<br>
 
 ## Team Members
-1. Team member 1
-2. Team member 2
-3. Team member 3
-4. ...
+1. Ahmad Khan
+2. Aristotelis Koutris
+3. Georgios Manos
+4. Maria Gkoulta
 
 ## Project Description 
-Describe here your project in detail and define your goals.
+The project aims to design an interactive system that adapts to each athlete's unique circumstances, including preferences and limitations. Whether it's adjusting for an injury or tailoring training needs, our technology is equipped to pivot, providing a truly personalized training journey. Our application delves into analyzing anonymized training data, which could be in time-series or tabular form, to unveil the patterns that lead to success. This could include things like body characteristics, training time, training frequency, heart rate or sleep duration. 
+
+Once an athlete logs into the platform, they're greeted with a dashboard displaying their performance history, biometrics, and the evolution of their body characteristics. It highlights the influence of specific training habits and lifestyle factors on their health or recovery, pinpointing areas for potential improvement. The platform allows for real-time adjustments to these factors, showing immediate projected impacts on performance and well-being. 
 
 ### Users
-List your projects target Users.
+The target users of our project are athletes, from beginners to intermediate levels, who are looking to improve specific aspects of their performance. The platform is designed to be user-friendly and accessible to all, regardless of their technical background.
 
 ### Datasets
-Add here all used datasets.\
-Document here where to find the data and how to download it. 
+The dataset used in this project is provided by our partners at TechnoGym. The data is anonymized and includes information on training habits and various biometrics collected by smartwatches and special equipment. The raw data are stored in excel files, from which we extract the information our model needs and collect everything in a .csv file, which can be found in the folder [data](backend-project/data).
 
 ### Tasks
-Define all the tasks you want your dashboard solve.
+The dashboard aims to solve the following tasks:
+1. **Performance Analysis**: The platform provides a detailed analysis of the athlete's performance, highlighting the influence of specific training habits and lifestyle factors on their health or recovery.
+2. **Personalized Recommendation**: The user will be able to select a specific goal, and the platform will provide personalized recommendations on how to achieve it by adjusting their training habits.
 
 - - -
 ## Folder Structure
@@ -100,13 +116,7 @@ To run the Dummy project you have to:
 - open a terminal instance and using the command ```cd``` move to the folder where the project has been downloaded;
 
 To run the backend
-- open the backend folder called "backend-project"
-- to start the backend first you need to create a virtual environment using conda
-    ```conda create -n nameOfTheEnvironment```
-  - to activate the virtual environment run the command ```conda activate nameOfTheEnvironment```
-  - install the requirements using the command ```pip3 install .```
-  - If you want to make changes and test them in real time, you can install the package in editable mode using the command```pip install -e .```
-  - to start the backend use the command ```python3 -m gamut_server.router.app``` or use the ```start-server``` command directly on your terminal
+- Check [backend readme](backend-project/README.md) for detailed instructions.
 
 To run the frontend
 - Open a new terminal window and go to the project folder
@@ -115,14 +125,15 @@ To run the frontend
 If all the steps have been successfully executed a new browser window witht he dummy project loaded will open automatically.
 
 ## Milestones
-Document here the major milestones of your code and future planned steps.\
+Document here the major milestones of your code and future planned steps.
 - [x] Week 1
-  - [x] Completed Sub-task: [#20984ec2](https://gitlab.inf.ethz.ch/COURSE-XAI-IML22/dummy-fullstack/-/commit/20984ec2197fa8dcdc50f19723e5aa234b9588a3)
-  - [x] Completed Sub-task: ...
+  - Create [pitch video](https://drive.google.com/file/d/1nu63RrAuE41CabnPYvGRDopRi_KDacI7/view).
 
-- [ ] Week 2
-  - [ ] Sub-task: [#2](https://gitlab.inf.ethz.ch/COURSE-XAI-IML22/dummy-fullstack/-/issues/2)
-  - [ ] Sub-task: ...
+- [x] Week 2
+  - [x] [Frontend Sketch](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/1): Create [sketch](https://www.figma.com/file/t3EVcrbK2uShNufGNmHsFX/xai?type=design&node-id=0%3A1&mode=design&t=0RMKaucwJU1ca0k5-1).
+  - [x] [Data Preprocessing: #2](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/2)
+  - [x] [Model: #3](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/3)
+  - [x] [Endpoints: #4](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/issues/4)
 
 Create a list subtask.\
 Open an issue for each subtask. Once you create a subtask, link the corresponding issue.\
@@ -140,12 +151,12 @@ We will use this to understand what your struggles and where did the weekly effo
 Create stable versions of your code each week by using gitlab tags.\
 Take a look at [Gitlab Tags](https://docs.gitlab.com/ee/topics/git/tags.html) for more details. 
 
-Then list here the weekly tags. \
+Then list here the weekly tags.\
 We will evaluate your code every week, based on the corresponding version.
 
 Tags:
-- Week 1: [Week 1 Tag](https://gitlab.inf.ethz.ch/COURSE-XAI-IML22/dummy-fullstack/-/tags/stable-readme)
-- Week 2: ..
+- Week 1: [Week 1 Tag](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/tags/v0.1.0)
+- Week 2: [Week 2 Tag](https://gitlab.inf.ethz.ch/course-xai-iml24/b13-explaining-athletes-performance/-/tags/v0.2.0)
 - Week 3: ..
 - ...
 
