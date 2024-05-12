@@ -7,12 +7,15 @@ const target_to_string = {
   weight: "Weight",
   body_fat_perc: "Body Fat %",
   muscle_mass_perc: "Muscle Mass %",
-  fitness_age: "Fitness Age",
+  metabolic_age: "Metabolic Age",
   fat_mass_perc: "Fat Mass %",
+  heart_rate_at_rest: "Heart Rate at Rest",
 };
 
 export const InteractionsContainer = ({
   target,
+  minTargetValue,
+  maxTargetValue,
   currentProjectedTarget,
   onTimePeriodSelected,
   onTargetSelected,
@@ -24,8 +27,8 @@ export const InteractionsContainer = ({
     false,
   ]);
   const [targetValue, setTargetValue] = useState(currentProjectedTarget);
-  const [minTargetValue, setMinTargetValue] = useState(60);
-  const [maxTargetValue, setMaxTargetValue] = useState(80);
+  // const [minTargetValue, setMinTargetValue] = useState(minTargetValue);
+  // const [maxTargetValue, setMaxTargetValue] = useState(maxTargetValue);
 
   const onRecommendationClicked = (index) => {
     console.log(`Recommendation ${index} Clicked`);
@@ -90,9 +93,10 @@ export const InteractionsContainer = ({
           >
             <option value={null}>Select target</option>
             <option value={"weight"}>Weight</option>
-            <option value={"fitness_age"}>Age</option>
+            <option value={"metabolic_age"}>Metabolic Age</option>
             <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
             <option value={"fat_mass_perc"}>Fat Mass Percentage</option>
+            <option value={"heart_rate_at_rest"}>Heart Rate at Rest</option>
           </Form.Select>
         </div>
         <div className="boxBodyRow gap">

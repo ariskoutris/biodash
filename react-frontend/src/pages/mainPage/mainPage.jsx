@@ -12,12 +12,10 @@ export const MainPage = ({ data }) => {
 
   useEffect(() => {
     setReadyData(data);
-    console.log(data)
   }, [data]);
 
   const onTimePeriodSelected = (e) => {
     const period = e.target.value;
-    console.log(period);
     setPeriod(period);
     // here filter data based on period
     setReadyData(data);
@@ -25,7 +23,6 @@ export const MainPage = ({ data }) => {
 
   const onTargetSelected = (e) => {
     const target = e.target.value;
-    console.log(target);
     setTarget(target);
     // here filter data based on target
     setReadyData(data);
@@ -44,6 +41,30 @@ export const MainPage = ({ data }) => {
     return Math.round(lineTS[lineTS.length - 1]["value"]);
   }
 
+  const getTargetMinMax = (target, data) => {
+    const currentValue = data.radar.current || 0;
+  
+    if (target === "weight") {
+      return { min: currentValue.Weight - 30, max: currentValue.Weight };
+    }
+
+    if (target === "metabolic_age") {
+      return { min: currentValue - 8, max: currentValue + 2};
+    }
+
+    if (target === "muscle_mass_perc") {
+      return { min: currentValue * 0.6, max: currentValue * 1.1 };
+    }
+
+    if (target === "fat_mass_perc") {
+      return { min: target * 0.7, max: target * 1.3 };
+    }
+
+    if (target === "heart_rate_at_rest") {    
+      return { min: target - 20, max: target + 5 };
+    }
+  }
+
   // if data not ready yet return empty
   if (!readyData) return <> </>;
 
@@ -60,6 +81,8 @@ export const MainPage = ({ data }) => {
         <InteractionsContainer 
           data={data} 
           target={target}
+          minTargetValue={getTargetMinMax(target, data).min}
+          maxTargetValue={getTargetMinMax(target, data).max}
           currentProjectedTarget={getCurrentProjectedTarget(data)}
           onTimePeriodSelected={onTimePeriodSelected}
           onTargetSelected={onTargetSelected}
