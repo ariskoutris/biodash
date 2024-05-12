@@ -45,7 +45,7 @@ export const MainPage = ({ data }) => {
     const currentValue = data.radar.current || 0;
   
     if (target === "weight") {
-      return { min: currentValue.Weight - 30, max: currentValue.Weight };
+      return { min: currentValue.Weight - 30, max: currentValue.Weight + 30};
     }
 
     if (target === "metabolic_age") {
