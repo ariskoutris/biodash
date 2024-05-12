@@ -17,3 +17,9 @@
   @extend .btn;
   font-size: small
 }
+
+.recBtn.selected {
+  background-color: #ffcc00; // Bootstrap primary color
+  color: black;
+  border-color: #b39200; // A darker shade of the primary color
+}

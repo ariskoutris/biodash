@@ -58,10 +58,10 @@ export const InteractionsContainer = ({
           <div className="boxBodyRow">
             {recommendataionTitles.map((name, index) => (
               <Button
-                className="recBtn"
+                className={`recBtn ${recommendationButtonState[index] ? 'selected' : ''}`}
                 style={{ maxWidth: "150px", height: "70px" }}
                 key={`${name}_${index}`}
-                onClick={onRecommendationClicked}
+                onClick={() => onRecommendationClicked(index)}
               >
                 {name}
               </Button>
