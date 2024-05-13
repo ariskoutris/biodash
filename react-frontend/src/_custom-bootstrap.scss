@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 @import './colors.module.scss';
 @import '~bootstrap/scss/bootstrap.scss';
 
@@ -6,4 +8,5 @@
   padding: 10px 20px;
   font-weight: bold;
   border: 1px solid black;
+  --bs-btn-active-bg: #{adjust-color($primary, $hue: 5%)};
 }
