@@ -1,9 +1,29 @@
 import json
 import random
 from uuid import uuid4
+import pickle
+import numpy as np
+import pandas as pd
+
+from darts.timeseries import TimeSeries
+from darts.models import RegressionModel
+from darts.utils.missing_values import fill_missing_values as darts_fill_na
 
 _data_store = {}
 
+model_path = "../forecasting-model/weight_model.pkl"
+preprocessor_path = "../forecasting-model/weight_preprocessor.pkl"
+model = RegressionModel.load(model_path)
+preprocess_pipeline = pickle.load(open(preprocessor_path, 'rb'))
+print("Model loaded")
+
+def create_and_fill_timeseries(row):
+    times = pd.Index(row['MeasuredOnWeek'])
+    values = row['Value']
+    covs = pd.DataFrame(data={ 'Gender': [row['Gender']], 'Age': [row['Age']] })
+    ts = TimeSeries.from_times_and_values(times=times, values=values, static_covariates=covs, freq=1)
+    filled_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
+    return filled_ts
 
 class BiometricsPredictor:
     @staticmethod
@@ -32,10 +52,7 @@ class BiometricsPredictor:
         """
         # Placeholder for current user metrics calculation
         biometric_data = user_data.get("biometric_data", {})
-        response = {
-            key.replace("_", " ").title(): value
-            for key, value in biometric_data.items()
-        }
+        response = {x['BiometricName']: x['Value'][-1] for x in biometric_data}
         return response
 
     @staticmethod
@@ -44,22 +61,23 @@ class BiometricsPredictor:
         Predict all metrics for the given period based on user data.
         """
         # Placeholder for prediction logic using user data and time period
-        biometric_data = user_data.get("biometric_data", {})
+
+        biometric_data = user_data.get("biometric_data", {}) 
+        age = user_data.get("age")
+        gender = user_data.get("gender")
+        covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
+        
         response = {}
-        if "weight" in biometric_data:
-            response["Weight"] = biometric_data["weight"] * random.uniform(0.9, 1.1)
-        if "muscle_mass_perc" in biometric_data:
-            response["Muscle Mass Perc"] = biometric_data[
-                "muscle_mass_perc"
-            ] * random.uniform(0.9, 1.1)
-        if "fat_mass_perc" in biometric_data:
-            response["Fat Mass Perc"] = biometric_data[
-                "fat_mass_perc"
-            ] * random.uniform(0.9, 1.1)
-        if "fitness_age" in biometric_data:
-            response["Fitness Age"] = biometric_data["fitness_age"] + random.randint(
-                -5, 5
-            )
+        for entry in biometric_data:
+            weeks = pd.Index(entry['MeasuredOnWeek'])
+            values = entry['Value']
+            ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
+            filled_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
+            trans_ts = preprocess_pipeline.transform(filled_ts)
+            pred = model.predict(4*period, [trans_ts])
+            unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
+            response[entry['BiometricName']] = unnorm_pred.values().flatten().tolist()[-1]
+
         return response
 
     @staticmethod
@@ -68,12 +86,27 @@ class BiometricsPredictor:
         Predict the values of a specific metric over the specified time period.
         """
         # Simulating a time series prediction
+        biometric_data = user_data.get("biometric_data", {}) 
+        age = user_data.get("age")
+        gender = user_data.get("gender")
+        covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
+        
+        biometric_data = user_data.get("biometric_data", {}) 
+        metric_data = [x for x in biometric_data if x['BiometricName'] == metric][0]
+        
+        weeks = pd.Index(metric_data['MeasuredOnWeek'])
+        values = metric_data['Value']
+        ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
+        filled_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
+        trans_ts = preprocess_pipeline.transform(filled_ts)
+        pred = model.predict(4*period, [trans_ts])
+        unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
+        
         return [
             {
-                "time": month,
-                "value": user_data["biometric_data"][metric] * random.uniform(0.9, 1.1),
-            }
-            for month in range(1, period + 1)
+                "time": week + 1,
+                "value": unnorm_pred.values().flatten().tolist()
+            } for week in trans_ts.time_index.tolist()
         ]
 
     @staticmethod
