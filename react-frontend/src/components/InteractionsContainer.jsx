@@ -1,7 +1,7 @@
 import "./InteractionsContainer.scss";
 import { useState } from "react";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+import ToggleButton from 'react-bootstrap/ToggleButton';
 
 const target_to_string = {
   weight: "Weight",
@@ -28,9 +28,8 @@ export const InteractionsContainer = ({
   const [maxTargetValue, setMaxTargetValue] = useState(80);
 
   const onRecommendationClicked = (index) => {
-    console.log(`Recommendation ${index} Clicked`);
-    const newButtonState = recommendationButtonState.map((_, i) =>
-      i === index ? true : false
+    const newButtonState = recommendationButtonState.map((val, i) => 
+      i === index ? !val : val
     );
     setRecommendationButtonState(newButtonState);
   };
@@ -48,20 +47,22 @@ export const InteractionsContainer = ({
 
   const recommendationButtons = () => {
     if (targetValue === currentProjectedTarget) {
-      return <caption>Move the slider to see recommendations</caption>;
+      return <p style={{color: "gray"}}>Move the slider to see recommendations</p>;
     } else {
       return (
         <div style={{ justifyContent: "center", gap: "20px" }}>
           <div className="boxBodyRow">
             {recommendataionTitles.map((name, index) => (
-              <Button
+              <ToggleButton
                 className="recBtn"
                 style={{ maxWidth: "150px", height: "70px" }}
                 key={`${name}_${index}`}
-                onClick={onRecommendationClicked}
+                onClick={() => onRecommendationClicked(index)}
+                checked={recommendationButtonState[index]}
+                type="checkbox"
               >
                 {name}
-              </Button>
+              </ToggleButton>
             ))}
           </div>
         </div>
