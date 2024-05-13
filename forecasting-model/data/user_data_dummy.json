@@ -1,10 +1,18 @@
 {
-    "biometric_data": {
-        "weight": 70.0,
-        "muscle_mass_perc": 55.0,
-        "fat_mass_perc": 45.0,
-        "fitness_age": 30
-    },
+    "age": 20,
+    "gender": "F",
+    "biometric_data": 
+        [
+            {"BiometricName": "Fat mass Perc",
+            "MeasuredOnWeek": [19, 39, 46, 50],
+            "Value": [40.2, 38.3, 40.6, 39.0]},
+            {"BiometricName": "Muscle Mass",
+            "MeasuredOnWeek": [19, 39, 46, 50],
+            "Value": [53.4, 54.9, 51.7, 53.3]},
+            {"BiometricName": "Weight",
+            "MeasuredOnWeek": [19, 39, 46, 50],
+            "Value": [94.0, 93.7, 91.7, 92.0]}
+        ],
     "training_data": [
         {
             "exercise": "GOAL exercise in time",
