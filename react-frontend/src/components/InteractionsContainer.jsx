@@ -89,10 +89,10 @@ export const InteractionsContainer = ({
           <Form.Select
             size="sm"
             onChange={onTargetSelected}
-            defaultValue={"weight"}
+            defaultValue={"Weight"}
           >
             <option value={null}>Select target</option>
-            <option value={"weight"}>Weight</option>
+            <option value={"Weight"}>Weight</option>
             <option value={"metabolic_age"}>Metabolic Age</option>
             <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
             <option value={"fat_mass_perc"}>Fat Mass Percentage</option>

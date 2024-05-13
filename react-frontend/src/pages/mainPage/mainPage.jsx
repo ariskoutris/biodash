@@ -8,7 +8,7 @@ import { InteractionsContainer } from "../../components/InteractionsContainer";
 export const MainPage = ({ data }) => {
   const [readyData, setReadyData] = useState();
   const [period, setPeriod] = useState(3); // in months
-  const [target, setTarget] = useState("weight");
+  const [target, setTarget] = useState("Weight");
 
   useEffect(() => {
     setReadyData(data);
@@ -44,20 +44,20 @@ export const MainPage = ({ data }) => {
   const getTargetMinMax = (target, data) => {
     const currentValue = data.radar.current || 0;
   
-    if (target === "weight") {
-      return { min: currentValue.Weight - 30, max: currentValue.Weight + 30};
+    if (target === "Weight") {
+      return { current: currentValue, min: currentValue.Weight - 30, max: currentValue.Weight + 30};
     }
 
     if (target === "metabolic_age") {
-      return { min: currentValue - 8, max: currentValue + 2};
+      return { current: currentValue, min: currentValue - 8, max: currentValue + 2};
     }
 
     if (target === "muscle_mass_perc") {
-      return { min: currentValue * 0.6, max: currentValue * 1.1 };
+      return { current: currentValue, min: currentValue * 0.6, max: currentValue * 1.1 };
     }
 
     if (target === "fat_mass_perc") {
-      return { min: target * 0.7, max: target * 1.3 };
+      return { current: currentValue,min: target * 0.7, max: target * 1.3 };
     }
 
     if (target === "heart_rate_at_rest") {    
