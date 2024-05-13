@@ -11,7 +11,7 @@
         <img src="https://img.shields.io/badge/Poetry-1.8.2-5119d4">
     </a>
     <br>
-    <a href="https://technogym.com"><strong>Check out Technogym »</strong></a>
+    <a href="http://b13-explaining-athletes-performance.course-xai-iml24.isginf.ch"><strong>Check out our website »</strong></a>
 </div>
 <br>
 
