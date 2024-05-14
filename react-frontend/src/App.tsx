@@ -24,14 +24,16 @@ function App() {
 
   // TODO: Add target and duration parameters as arguments
   const getLine = async (e : any) => {
-    const _data = await postPoints(`line/${e.user_id}/weight/5`);
+    const _data = await postPoints(`line/${e.user_id}/Weight/5`);
     console.log(_data)
     setLineData(_data || true)
   }
 
   // TODO: Add target and duration parameters as arguments
   const getBar = async (e : any) => {
-    const _data = await postPoints(`features/${e.user_id}/weight/5`);
+    const metric = e.metric || 'Weight'
+    const period = e.period || 5
+    const _data = await postPoints(`features/${e.user_id}/${metric}/${period}`);
     console.log(_data)
     setBarData(_data || true)
   }
@@ -47,7 +49,7 @@ function App() {
 
   // Effect to fetch user details when `user` is updated
   useEffect(() => {
-    console.log(user.user_id)
+    // console.log(user.user_id)
     if (user) {
       getRadar(user)
       getLine(user)

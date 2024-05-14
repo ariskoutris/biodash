@@ -50,10 +50,9 @@ class LineChartResource(Resource):
             user_data = BiometricsPredictor.get_user_data(user_id)
         except KeyError:
             return {"message": "Invalid user ID"}, 404
-
-        if metric not in user_data.get("biometric_data", {}).keys():
+        available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
+        if metric not in available_metrics:
             return {"message": f"{metric} metric unavailable for user"}, 400
-
         time_series_prediction = BiometricsPredictor.predict_metric_over_time(
             user_data, metric, period
         )
@@ -79,7 +78,8 @@ class FeatureImportanceResource(Resource):
         except KeyError:
             return {"message": "Invalid user ID"}, 404
 
-        if metric not in user_data.get("biometric_data", {}).keys():
+        available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
+        if metric not in available_metrics:
             return {"message": f"{metric} metric unavailable for user"}, 400
 
         feature_importance_data = {

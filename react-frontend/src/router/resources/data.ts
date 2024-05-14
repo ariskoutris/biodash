@@ -23,12 +23,20 @@ export function postPoints(id: string): Promise<DataArray | undefined> {
 
 export function sendData(id: string): Promise<DataArray | undefined> {
   const data = {
-    "biometric_data": {
-        "weight": 70.0,
-        "muscle_mass_perc": 55.0,
-        "fat_mass_perc": 45.0,
-        "fitness_age": 30
-    },
+    "age": 20,
+    "gender": "F",
+    "biometric_data": 
+        [
+            {"BiometricName": "Fat mass Perc",
+            "MeasuredOnWeek": [19, 39, 46, 50],
+            "Value": [40.2, 38.3, 40.6, 39.0]},
+            {"BiometricName": "Muscle Mass",
+            "MeasuredOnWeek": [19, 39, 46, 50],
+            "Value": [53.4, 54.9, 51.7, 53.3]},
+            {"BiometricName": "Weight",
+            "MeasuredOnWeek": [19, 39, 46, 50],
+            "Value": [94.0, 93.7, 91.7, 92.0]}
+        ],
     "training_data": [
         {
             "exercise": "GOAL exercise in time",
@@ -47,6 +55,22 @@ export function sendData(id: string): Promise<DataArray | undefined> {
             "mets_min": 6.1
         },
         {
+            "exercise": "Calf raise",
+            "equipment": "Barbell",
+            "date": "2024-04-03",
+            "duration": 360,
+            "calories": 65,
+            "mets_min": 7.0
+        },
+        {
+            "exercise": "Back extension",
+            "equipment": "Lower Back Sel",
+            "date": "2024-04-03",
+            "duration": 287,
+            "calories": 28,
+            "mets_min": 3.8
+        },
+        {
             "exercise": "Crunch",
             "equipment": "Abdominal Crunch Sel",
             "date": "2024-04-03",
@@ -55,8 +79,8 @@ export function sendData(id: string): Promise<DataArray | undefined> {
             "mets_min": 3.3
         }
     ]
-  }
-  const config = {
+}
+const config = {
     headers: {
       'Content-Type': 'application/json',
     }

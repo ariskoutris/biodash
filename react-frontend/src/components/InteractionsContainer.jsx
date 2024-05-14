@@ -1,19 +1,14 @@
 import "./InteractionsContainer.scss";
 import { useState } from "react";
 import Form from "react-bootstrap/Form";
-import ToggleButton from 'react-bootstrap/ToggleButton';
-
-const target_to_string = {
-  weight: "Weight",
-  body_fat_perc: "Body Fat %",
-  muscle_mass_perc: "Muscle Mass %",
-  fitness_age: "Fitness Age",
-  fat_mass_perc: "Fat Mass %",
-};
+import ToggleButton from "react-bootstrap/ToggleButton";
+import { getTargetLabel, getTargetUnits } from "../utils";
 
 export const InteractionsContainer = ({
   target,
-  currentProjectedTarget,
+  minTargetValue,
+  maxTargetValue,
+  projectedTarget,
   onTimePeriodSelected,
   onTargetSelected,
 }) => {
@@ -23,12 +18,11 @@ export const InteractionsContainer = ({
     false,
     false,
   ]);
-  const [targetValue, setTargetValue] = useState(currentProjectedTarget);
-  const [minTargetValue, setMinTargetValue] = useState(60);
-  const [maxTargetValue, setMaxTargetValue] = useState(80);
+
+  const [targetValue, setTargetValue] = useState(projectedTarget);
 
   const onRecommendationClicked = (index) => {
-    const newButtonState = recommendationButtonState.map((val, i) => 
+    const newButtonState = recommendationButtonState.map((val, i) =>
       i === index ? !val : val
     );
     setRecommendationButtonState(newButtonState);
@@ -46,8 +40,10 @@ export const InteractionsContainer = ({
   };
 
   const recommendationButtons = () => {
-    if (targetValue === currentProjectedTarget) {
-      return <p style={{color: "gray"}}>Move the slider to see recommendations</p>;
+    if (targetValue === projectedTarget) {
+      return (
+        <p style={{ color: "gray" }}>Move the slider to see recommendations</p>
+      );
     } else {
       return (
         <div style={{ justifyContent: "center", gap: "20px" }}>
@@ -87,13 +83,14 @@ export const InteractionsContainer = ({
           <Form.Select
             size="sm"
             onChange={onTargetSelected}
-            defaultValue={"weight"}
+            defaultValue={"Weight"}
           >
             <option value={null}>Select target</option>
-            <option value={"weight"}>Weight</option>
-            <option value={"fitness_age"}>Age</option>
+            <option value={"Weight"}>Weight</option>
+            <option value={"metabolic_age"}>Metabolic Age</option>
             <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
             <option value={"fat_mass_perc"}>Fat Mass Percentage</option>
+            <option value={"heart_rate_at_rest"}>Heart Rate at Rest</option>
           </Form.Select>
         </div>
         <div className="boxBodyRow gap">
@@ -106,13 +103,15 @@ export const InteractionsContainer = ({
               onChange={onTargetValueChanged}
               tooltip="auto"
             />
-            <p>Selected Value: {targetValue}kg</p>
+            <p>
+              Selected Value: {targetValue} {getTargetUnits(target)}
+            </p>
           </div>
         </div>
       </div>
       <div className="boxBodyColumn">
         <div style={{ paddingBottom: "50px" }} className="boxBodyColumn">
-          {`Recommendations for ${target_to_string[target]}`}
+          {`Recommendations for ${getTargetLabel(target)}`}
           {recommendationButtons()}
         </div>
       </div>
