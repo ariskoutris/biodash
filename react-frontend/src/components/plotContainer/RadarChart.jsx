@@ -6,9 +6,10 @@ import {
   Filler,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Radar } from 'react-chartjs-2';
-import colors from '../../colors.module.scss';
+} from "chart.js";
+import { Radar } from "react-chartjs-2";
+import colors from "../../colors.module.scss";
+import { getRadarLabels } from "../../utils";
 
 ChartJS.register(
   RadialLinearScale,
@@ -19,24 +20,22 @@ ChartJS.register(
   Legend
 );
 
-
-const RadarChart = ({data, target_hook}) => {
-  console.log(colors)
-  const labels = Object.keys(data.current);
+const RadarChart = ({ data }) => {
+  const labels = getRadarLabels(data);
   const currentValues = Object.values(data.current);
   const predictedValues = Object.values(data.predicted);
   const radarData = {
     labels,
     datasets: [
       {
-        label: 'Current',
+        label: "Current",
         data: currentValues,
         backgroundColor: colors.currentPlotColorLight,
         borderColor: colors.currentPlotColor,
         borderWidth: 1,
       },
       {
-        label: 'Predicted',
+        label: "Predicted",
         data: predictedValues,
         backgroundColor: colors.predictedPlotColorLight,
         borderColor: colors.predictedPlotColor,
@@ -44,7 +43,15 @@ const RadarChart = ({data, target_hook}) => {
       },
     ],
   };
-  return <Radar data={radarData}/>
-}
-  
+  const options = {
+    scales: {
+      r: {
+        min: 0,
+        max: 100,
+      },
+    },
+  };
+  return <Radar data={radarData} options={options} />;
+};
+
 export default RadarChart;
