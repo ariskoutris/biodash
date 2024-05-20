@@ -29,17 +29,17 @@ RUN apt-get update \
 WORKDIR /srv/backend-app
 
 # Copy only pyproject.toml and poetry.lock (if available) to cache dependencies
-COPY pyproject.toml poetry.lock* /srv/backend-app/
+COPY README.md pyproject.toml poetry.lock* /srv/backend-app/
 
 # Disable creation of a virtual environment as the container itself is isolated
 RUN poetry config virtualenvs.create false
 
-# Copy the rest of your application code
-COPY . /srv/backend-app
 
 # Install runtime dependencies using Poetry
-RUN poetry install --only main
+RUN poetry install --only main --no-cache
 
+# Copy the rest of your application code
+COPY . /srv/backend-app
 
 # Command to run your application
 CMD ["python", "-m", "src.server.router.app", "--host", "0.0.0.0"]
