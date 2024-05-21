@@ -20,12 +20,7 @@ flask-cors = "^4.0.0"
 flake8 = "^7.0.0"
 marshmallow = "^3.21.1"
 joblib = "^1.4.0"
-torch = [
-    {url = "https://download.pytorch.org/whl/cpu/torch-2.3.0-cp310-cp310-manylinux_2_17_aarch64.manylinux2014_aarch64.whl#sha256=7e24c138c3bacc8c511c6b8211f09c3bf547d3cbe3756321acec1bdce40fec6b", markers = "sys_platform == 'linux' and platform_machine == 'aarch64'"},
-    {url = "https://download.pytorch.org/whl/cpu-cxx11-abi/torch-2.3.0%2Bcpu.cxx11.abi-cp310-cp310-linux_x86_64.whl#sha256=896e8a82f441ff8ae5c8acd2fddd48d9ae1f2738fb8c083b912debbbe09c553b", markers = "sys_platform == 'linux' and platform_machine == 'x86_64'"},
-    {url = "https://download.pytorch.org/whl/cpu/torch-2.3.0-cp310-none-macosx_11_0_arm64.whl#sha256=758ef938de87a2653bba74b91f703458c15569f1562bf4b6c63c62d9c5a0c1f5", markers = "sys_platform == 'darwin' and platform_machine == 'arm64'"}
-]
-darts = "^0.29.0"
+u8darts = "^0.29.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "24.3.0"
