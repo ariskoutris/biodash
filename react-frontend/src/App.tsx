@@ -24,7 +24,7 @@ function App() {
 
   // TODO: Add target and duration parameters as arguments
   const getLine = async (e : any) => {
-    const _data = await postPoints(`line/${e.user_id}/Weight/5`);
+    const _data = await postPoints(`line/${e.user_id}/5`);
     console.log(_data)
     setLineData(_data || true)
   }

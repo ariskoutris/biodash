@@ -5,8 +5,8 @@ from .exercise import ExerciseSchema
 
 
 class UserSchema(Schema):
-    biometric_data = fields.List(fields.Nested(BiometricDataSchema))
-    training_data = fields.List(fields.Nested(ExerciseSchema))
+    biometric_data = fields.List(fields.Nested(BiometricDataSchema()))
+    training_data = fields.List(fields.Nested(ExerciseSchema()))
     gender = fields.Str()
     age = fields.Int()
 
