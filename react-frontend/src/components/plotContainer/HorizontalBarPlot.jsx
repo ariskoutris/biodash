@@ -25,7 +25,7 @@ ChartJS.register(
 const HorizontalBarPlot = ({data}) => {
 
     const labels = Object.keys(data.importances);
-    const importances = Object.values(data.importances);
+    const importances = Object.values(data.importances).map((value) => value[4]);
     const options = {
         indexAxis: 'y',
         elements: {

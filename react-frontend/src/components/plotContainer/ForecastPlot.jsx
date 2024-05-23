@@ -49,9 +49,9 @@ const ForecastPlot = ({data, min, max, units}) => {
           },
         }
       }
-
-      const labels = data.time_series.map(item => item.time);
-      const values = data.time_series.map(item => item.value);
+      // TODO: Change the "weight" to the correct metric
+      const labels = data.metrics.Weight.map(item => item.time);
+      const values = data.metrics.Weight.map(item => item.value);
 
        const line_data = {
         labels,
