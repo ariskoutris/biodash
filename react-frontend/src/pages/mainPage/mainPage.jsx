@@ -11,10 +11,17 @@ import {
   getProjectedTarget,
 } from "../../utils";
 
-export const MainPage = ({ data }) => {
+export const MainPage = ({
+  data,
+  recData,
+  period,
+  setPeriod,
+  target,
+  setTarget,
+  getRecommendations,
+  handleRecommendationClick,
+}) => {
   const [readyData, setReadyData] = useState();
-  const [period, setPeriod] = useState(3); // in months
-  const [target, setTarget] = useState("Weight");
 
   useEffect(() => {
     setReadyData(data);
@@ -43,10 +50,12 @@ export const MainPage = ({ data }) => {
       min={getTargetMinMax(target, data).min}
       max={getTargetMinMax(target, data).max}
       units={getTargetUnits(target)}
+      metric={target}
+      period={period}
     />
   );
   const radarChart = <RadarChart data={data.radar} />;
-  const barPlot = <HorizontalBarPlot data={data.bar} />;
+  const barPlot = <HorizontalBarPlot data={data.bar} period={period} />;
 
   const size = "90%";
 
@@ -55,13 +64,16 @@ export const MainPage = ({ data }) => {
     <div className="boxBody">
       <div className="boxBodyColumn">
         <InteractionsContainer
-          data={data}
+          data={readyData}
+          recData={recData}
           target={target}
           minTargetValue={getTargetMinMax(target, data).min}
           maxTargetValue={getTargetMinMax(target, data).max}
           projectedTarget={getProjectedTarget(target, data)}
           onTimePeriodSelected={onTimePeriodSelected}
           onTargetSelected={onTargetSelected}
+          getRecommendations={getRecommendations}
+          handleRecommendationClick={handleRecommendationClick}
         />
         <div className="boxBodyRow">
           <div className="boxBodyColumn">

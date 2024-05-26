@@ -104,7 +104,7 @@ class RecommendationsResource(Resource):
         try:
             user_data = BiometricsPredictor.get_user_data(user_id)
             recommendations = BiometricsPredictor.generate_recommendations(
-                user_id=user_data, target=target, metric=metric, period=period
+                user_id=user_id, target=target, metric=metric, period=period
             )
         except KeyError:
             return {"message": "Invalid user ID"}, 404
