@@ -1,18 +1,22 @@
 import "./InteractionsContainer.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import ToggleButton from "react-bootstrap/ToggleButton";
-import { getTargetLabel, getTargetUnits } from "../utils";
+import { getTargetFromLabel, getTargetLabel, getTargetUnits } from "../utils";
+var _ = require('lodash');
 
 export const InteractionsContainer = ({
+  data,
+  recData,
   target,
   minTargetValue,
   maxTargetValue,
   projectedTarget,
   onTimePeriodSelected,
   onTargetSelected,
+  getRecommendations,
+  handleRecommendationClick,
 }) => {
-  const [recommendataionTitles, setRecommendationTitles] = useState([]);
   const [recommendationButtonState, setRecommendationButtonState] = useState([
     false,
     false,
@@ -21,22 +25,23 @@ export const InteractionsContainer = ({
 
   const [targetValue, setTargetValue] = useState(projectedTarget);
 
-  const onRecommendationClicked = (index) => {
+  useEffect(() => {
+    setTargetValue(projectedTarget);
+  }, [projectedTarget]);
+
+  const onRecommendationClicked = (value, index) => {
+    console.log(index, recommendationButtonState)
     const newButtonState = recommendationButtonState.map((val, i) =>
-      i === index ? !val : val
+      i === index ? !val : false
     );
+    handleRecommendationClick(newButtonState[index] && value)
     setRecommendationButtonState(newButtonState);
   };
 
-  // TODO: adjust recommendation based on new target value
-  const onTargetValueChanged = (e) => {
-    // call the backend to get the recommendations
-    setRecommendationTitles([
-      "Increase Workouts Per Week",
-      "Increase Legs",
-      "Increase Arms",
-    ]);
-    setTargetValue(parseInt(e.target.value));
+  const onTargetValueChanged = async (e) => {
+    const goal = e.target.value;
+    setTargetValue(goal);
+    await getRecommendations(goal);
   };
 
   const recommendationButtons = () => {
@@ -48,16 +53,16 @@ export const InteractionsContainer = ({
       return (
         <div style={{ justifyContent: "center", gap: "20px" }}>
           <div className="boxBodyRow">
-            {recommendataionTitles.map((name, index) => (
+            {_.map(recData, (value, index) => (
               <ToggleButton
                 className="recBtn"
                 style={{ maxWidth: "150px", height: "70px" }}
-                key={`${name}_${index}`}
-                onClick={() => onRecommendationClicked(index)}
+                key={value.title}
+                onClick={() => onRecommendationClicked(value, index)}
                 checked={recommendationButtonState[index]}
                 type="checkbox"
               >
-                {name}
+                {value.title}
               </ToggleButton>
             ))}
           </div>
@@ -65,6 +70,11 @@ export const InteractionsContainer = ({
       );
     }
   };
+
+  const x = _.map(data.radar.current, (_, key) => (
+    [key, getTargetFromLabel(key)]
+  ))
+  console.log(x)
 
   return (
     <div className="boxBodyRow">
@@ -75,22 +85,27 @@ export const InteractionsContainer = ({
             onChange={onTimePeriodSelected}
             defaultValue={3}
           >
-            <option value={null}>Select period</option>
-            <option value={3}>3 months</option>
-            <option value={6}>6 months</option>
-            <option value={12}>12 months</option>
+            {_.range(1, 13).map((num) => (
+              <option key={num} value={num}>
+                {num} Months
+              </option>
+            ))}
           </Form.Select>
           <Form.Select
             size="sm"
             onChange={onTargetSelected}
             defaultValue={"Weight"}
           >
-            <option value={null}>Select target</option>
-            <option value={"Weight"}>Weight</option>
+            {_.map(data.radar.current, (_, key) => (
+              <option key={key} value={getTargetFromLabel(key)}>
+                {key}
+              </option>
+            ))}
+            {/* <option value={"Weight"}>Weight</option>
             <option value={"metabolic_age"}>Metabolic Age</option>
             <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
             <option value={"fat_mass_perc"}>Fat Mass Percentage</option>
-            <option value={"heart_rate_at_rest"}>Heart Rate at Rest</option>
+            <option value={"heart_rate_at_rest"}>Heart Rate at Rest</option> */}
           </Form.Select>
         </div>
         <div className="boxBodyRow gap">

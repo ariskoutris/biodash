@@ -1,12 +1,12 @@
 // Define Custom Colors here
-$current-plot-color: rgba(255, 204, 0, 1);
+$current-plot-color: rgb(255, 204, 0);
 $current-plot-color-light:  rgba(255, 204, 0, 0.2);
 
-$predicted-plot-color: rgba(132, 99, 255, 1);
-$predicted-plot-color-light: rgba(132, 99, 255, 0.2);
+$predicted-plot-color: rgb(204, 0, 255);
+$predicted-plot-color-light: rgba(204, 0, 255, 0.2);
 
-// $recommended-plot-color: #fada48;
-// $recommended-plot-color-light: #fada48;
+$recommended-plot-color: rgb(0, 255, 204);
+$recommended-plot-color-light: rgb(0, 255, 204, 0.2);
 
 // Define Bootstrap Variables here
 $primary: #fada48;
@@ -18,6 +18,8 @@ $primary: #fada48;
   currentPlotColorLight: $current-plot-color-light;
   predictedPlotColor: $predicted-plot-color;
   predictedPlotColorLight: $predicted-plot-color-light;
+  recommendedPlotColor: $recommended-plot-color;
+  recommendedPlotColorLight: $recommended-plot-color-light;
   primary: $primary;
   // secondary: $secondary;
 }
