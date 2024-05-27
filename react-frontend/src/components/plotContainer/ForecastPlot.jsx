@@ -7,9 +7,11 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
-import colors from '../../colors.module.scss';
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import colors from "../../colors.module.scss";
+import { getLineChartKeys } from "../../utils";
+var _ = require("lodash");
 
 ChartJS.register(
   CategoryScale,
@@ -21,34 +23,52 @@ ChartJS.register(
   Legend
 );
 
-
-
-const ForecastPlot = ({data}) => {
-     const options = {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top',
-            display: false,
-          }
+const ForecastPlot = ({ data, min, max, units, metric, period }) => {
+  const numWeeks = Math.floor((period * 52) / 12);
+  const lineData = _.mapValues(data, (val) =>
+    _.filter(
+      val[getLineChartKeys(metric)] || [],
+      (item) => item.time <= numWeeks
+    )
+  );
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+      },
+    },
+    scales: {
+      y: {
+        min: min,
+        max: max,
+        title: {
+          display: true,
+          text: units,
         },
-      };
+      },
+      x: {
+        title: {
+          display: true,
+          text: "Time/weeks",
+        },
+      },
+    },
+  };
+  const labels = lineData?.predicted.map((item) => item.time);
 
-      const labels = data.time_series.map(item => item.time);
-      const values = data.time_series.map(item => item.value);
-
-       const line_data = {
-        labels,
-        datasets: [
-          {
-            // label: 'Dataset 1',
-            data: values,
-            borderColor: colors.currentPlotColor,
-            backgroundColor: colors.currentPlotColorLight,
-          },
-        ],
+  const line_data = {
+    labels,
+    datasets: _.map(lineData, (val, key) => {
+      return {
+        label: key,
+        data: val.map((item) => item.value),
+        borderColor: colors[key + "PlotColor"],
+        backgroundColor: colors[key + "PlotColorLight"],
       };
-   return <Line options={options} data={line_data} />;
-}
-  
+    }),
+  };
+  return <Line options={options} data={line_data} />;
+};
+
 export default ForecastPlot;

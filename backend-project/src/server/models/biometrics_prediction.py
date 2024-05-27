@@ -1,9 +1,11 @@
-import json
+import math
 import random
 from uuid import uuid4
 import pickle
 import numpy as np
 import pandas as pd
+from math import ceil
+import os
 
 from darts.timeseries import TimeSeries
 from darts.models import RegressionModel
@@ -11,19 +13,23 @@ from darts.utils.missing_values import fill_missing_values as darts_fill_na
 
 _data_store = {}
 
-model_path = "../forecasting-model/weight_model.pkl"
-preprocessor_path = "../forecasting-model/weight_preprocessor.pkl"
+dirname = os.path.dirname(__file__)
+model_path = os.path.join(dirname, "../weights/weight_model.pkl")
+preprocessor_path = os.path.join(dirname, "../weights/weight_preprocessor.pkl")
 model = RegressionModel.load(model_path)
 preprocess_pipeline = pickle.load(open(preprocessor_path, 'rb'))
+WEEKS_PER_MONTH = 4.345
 print("Model loaded")
+
 
 def create_and_fill_timeseries(row):
     times = pd.Index(row['MeasuredOnWeek'])
     values = row['Value']
-    covs = pd.DataFrame(data={ 'Gender': [row['Gender']], 'Age': [row['Age']] })
+    covs = pd.DataFrame(data={'Gender': [row['Gender']], 'Age': [row['Age']]})
     ts = TimeSeries.from_times_and_values(times=times, values=values, static_covariates=covs, freq=1)
     filled_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
     return filled_ts
+
 
 class BiometricsPredictor:
     @staticmethod
@@ -62,11 +68,11 @@ class BiometricsPredictor:
         """
         # Placeholder for prediction logic using user data and time period
 
-        biometric_data = user_data.get("biometric_data", {}) 
+        biometric_data = user_data.get("biometric_data", {})
         age = user_data.get("age")
         gender = user_data.get("gender")
         covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
-        
+
         response = {}
         for entry in biometric_data:
             weeks = pd.Index(entry['MeasuredOnWeek'])
@@ -74,7 +80,7 @@ class BiometricsPredictor:
             ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
             filled_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
             trans_ts = preprocess_pipeline.transform(filled_ts)
-            pred = model.predict(4*period, [trans_ts])
+            pred = model.predict(math.floor(52 * period / 12), [trans_ts])
             unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
             response[entry['BiometricName']] = unnorm_pred.values().flatten().tolist()[-1]
 
@@ -86,36 +92,71 @@ class BiometricsPredictor:
         Predict the values of a specific metric over the specified time period.
         """
         # Simulating a time series prediction
-        biometric_data = user_data.get("biometric_data", {}) 
+        biometric_data = user_data.get("biometric_data", {})
         age = user_data.get("age")
         gender = user_data.get("gender")
         covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
-        
-        biometric_data = user_data.get("biometric_data", {}) 
+
+        biometric_data = user_data.get("biometric_data", {})
         metric_data = [x for x in biometric_data if x['BiometricName'] == metric][0]
-        
+
         weeks = pd.Index(metric_data['MeasuredOnWeek'])
         values = metric_data['Value']
         ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
         filled_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
         trans_ts = preprocess_pipeline.transform(filled_ts)
-        pred = model.predict(4*period, [trans_ts])
+        pred = model.predict(ceil(WEEKS_PER_MONTH * period), [trans_ts])
         unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
-        
+
         return [
             {
-                "time": week + 1,
-                "value": unnorm_pred.values().flatten().tolist()
-            } for week in trans_ts.time_index.tolist()
+                "time": week,
+                "value": value
+            } for week, value in zip(range(1, math.floor(52 * period / 12) + 1), unnorm_pred.values().flatten().tolist())
         ]
 
     @staticmethod
-    def calculate_feature_importances(user_data, metric, period):
+    def calculate_feature_importances(user_id, metric, period):
         """
         Calculate feature importances for the specified metric and period.
         """
         # Placeholder logic for calculating feature importances
         return {
-            "Workouts per Week": random.uniform(0.1, 0.5),
-            "Calories per Workout": random.uniform(0.1, 0.5),
+            "Workouts per Week": [random.uniform(0.1, 0.5) for _ in range(ceil(WEEKS_PER_MONTH * period))],
+            "Calories per Workout": [random.uniform(0.1, 0.5) for _ in range(ceil(WEEKS_PER_MONTH * period))],
+        }
+
+    @staticmethod
+    def generate_recommendations(user_id, metric, target, period):
+        """
+        Calculate feature importances for the specified metric, desired target and period.
+        """
+        # Placeholder logic for generating recommendations for the user with the defined target
+        user_data = BiometricsPredictor.get_user_data(user_id)
+
+        return {
+            "user_id": user_id,
+            "recommendations": {
+                "1": {
+                    "recommendation": "Leg workouts per week",
+                    "value": random.uniform(1, 5),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, period),
+                    "new_ts": BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
+                },
+                "2": {
+                    "recommendation": "Cardio Time per week (minutes)",
+                    "value": random.uniform(60, 300),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, period),
+                    "new_ts": BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
+                },
+                "3": {
+                    "recommendation": "Calories per workout (kcal)",
+                    "value": random.uniform(300, 800),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, period),
+                    "new_ts": BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
+                }
+            },
+            "target": target,
+            "metric": metric,
+            "period": period,
         }

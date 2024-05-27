@@ -4,20 +4,31 @@ import RadarChart from "../../components/plotContainer/RadarChart";
 import ForecastPlot from "../../components/plotContainer/ForecastPlot";
 import HorizontalBarPlot from "../../components/plotContainer/HorizontalBarPlot";
 import { InteractionsContainer } from "../../components/InteractionsContainer";
+import {
+  getTargetMinMax,
+  getTargetLabel,
+  getTargetUnits,
+  getProjectedTarget,
+} from "../../utils";
 
-export const MainPage = ({ data }) => {
+export const MainPage = ({
+  data,
+  recData,
+  period,
+  setPeriod,
+  target,
+  setTarget,
+  getRecommendations,
+  handleRecommendationClick,
+}) => {
   const [readyData, setReadyData] = useState();
-  const [period, setPeriod] = useState(3); // in months
-  const [target, setTarget] = useState("weight");
 
   useEffect(() => {
     setReadyData(data);
-    console.log(data)
   }, [data]);
 
   const onTimePeriodSelected = (e) => {
     const period = e.target.value;
-    console.log(period);
     setPeriod(period);
     // here filter data based on period
     setReadyData(data);
@@ -25,31 +36,26 @@ export const MainPage = ({ data }) => {
 
   const onTargetSelected = (e) => {
     const target = e.target.value;
-    console.log(target);
     setTarget(target);
     // here filter data based on target
     setReadyData(data);
   };
 
-  // this is a demo hook for the plot
-  const RadarPlotHook = (target) => {
-    // set the buttons names to generate
-    // setRecommendationButtonState into an array of the same size as the names so we don't overflow
-    // set the showRecommendationButtons to true to display them
-    // keep what was pressed
-  };
-
-  const getCurrentProjectedTarget = (data) => {
-    const lineTS = data.line.time_series;
-    return Math.round(lineTS[lineTS.length - 1]["value"]);
-  }
-
   // if data not ready yet return empty
-  if (!readyData) return <> </>;
+  if (!readyData) return <></>;
 
-  const forecastPlot = <ForecastPlot data={data.line} />;
+  const forecastPlot = (
+    <ForecastPlot
+      data={data.line}
+      min={getTargetMinMax(target, data).min}
+      max={getTargetMinMax(target, data).max}
+      units={getTargetUnits(target)}
+      metric={target}
+      period={period}
+    />
+  );
   const radarChart = <RadarChart data={data.radar} />;
-  const barPlot = <HorizontalBarPlot data={data.bar} />;
+  const barPlot = <HorizontalBarPlot data={data.bar} period={period} />;
 
   const size = "90%";
 
@@ -57,12 +63,17 @@ export const MainPage = ({ data }) => {
   return (
     <div className="boxBody">
       <div className="boxBodyColumn">
-        <InteractionsContainer 
-          data={data} 
+        <InteractionsContainer
+          data={readyData}
+          recData={recData}
           target={target}
-          currentProjectedTarget={getCurrentProjectedTarget(data)}
+          minTargetValue={getTargetMinMax(target, data).min}
+          maxTargetValue={getTargetMinMax(target, data).max}
+          projectedTarget={getProjectedTarget(target, data)}
           onTimePeriodSelected={onTimePeriodSelected}
           onTargetSelected={onTargetSelected}
+          getRecommendations={getRecommendations}
+          handleRecommendationClick={handleRecommendationClick}
         />
         <div className="boxBodyRow">
           <div className="boxBodyColumn">
@@ -77,14 +88,14 @@ export const MainPage = ({ data }) => {
           <div className="boxBodyColumn">
             <PlotContainer
               key="ForecastPlot"
-              title="Forecast"
+              title={`Forecast for ${getTargetLabel(target)}`}
               content={forecastPlot}
               height={size}
               width={size}
             />
             <PlotContainer
               key="BarPlot"
-              title="Feature importance"
+              title={`Feature importance for ${getTargetLabel(target)}`}
               content={barPlot}
               height={size}
               width={size}

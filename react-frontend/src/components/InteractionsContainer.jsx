@@ -1,73 +1,80 @@
 import "./InteractionsContainer.scss";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-
-const target_to_string = {
-  weight: "Weight",
-  body_fat_perc: "Body Fat %",
-  muscle_mass_perc: "Muscle Mass %",
-  fitness_age: "Fitness Age",
-  fat_mass_perc: "Fat Mass %",
-};
+import ToggleButton from "react-bootstrap/ToggleButton";
+import { getTargetFromLabel, getTargetLabel, getTargetUnits } from "../utils";
+var _ = require('lodash');
 
 export const InteractionsContainer = ({
+  data,
+  recData,
   target,
-  currentProjectedTarget,
+  minTargetValue,
+  maxTargetValue,
+  projectedTarget,
   onTimePeriodSelected,
   onTargetSelected,
+  getRecommendations,
+  handleRecommendationClick,
 }) => {
-  const [recommendataionTitles, setRecommendationTitles] = useState([]);
   const [recommendationButtonState, setRecommendationButtonState] = useState([
     false,
     false,
     false,
   ]);
-  const [targetValue, setTargetValue] = useState(currentProjectedTarget);
-  const [minTargetValue, setMinTargetValue] = useState(60);
-  const [maxTargetValue, setMaxTargetValue] = useState(80);
 
-  const onRecommendationClicked = (index) => {
-    console.log(`Recommendation ${index} Clicked`);
-    const newButtonState = recommendationButtonState.map((_, i) =>
-      i === index ? true : false
+  const [targetValue, setTargetValue] = useState(projectedTarget);
+
+  useEffect(() => {
+    setTargetValue(projectedTarget);
+  }, [projectedTarget]);
+
+  const onRecommendationClicked = (value, index) => {
+    console.log(index, recommendationButtonState)
+    const newButtonState = recommendationButtonState.map((val, i) =>
+      i === index ? !val : false
     );
+    handleRecommendationClick(newButtonState[index] && value)
     setRecommendationButtonState(newButtonState);
   };
 
-  // TODO: adjust recommendation based on new target value
-  const onTargetValueChanged = (e) => {
-    // call the backend to get the recommendations
-    setRecommendationTitles([
-      "Increase Workouts Per Week",
-      "Increase Legs",
-      "Increase Arms",
-    ]);
-    setTargetValue(parseInt(e.target.value));
+  const onTargetValueChanged = async (e) => {
+    const goal = e.target.value;
+    setTargetValue(goal);
+    await getRecommendations(goal);
   };
 
   const recommendationButtons = () => {
-    if (targetValue === currentProjectedTarget) {
-      return <caption>Move the slider to see recommendations</caption>;
+    if (targetValue === projectedTarget) {
+      return (
+        <p style={{ color: "gray" }}>Move the slider to see recommendations</p>
+      );
     } else {
       return (
         <div style={{ justifyContent: "center", gap: "20px" }}>
           <div className="boxBodyRow">
-            {recommendataionTitles.map((name, index) => (
-              <Button
+            {_.map(recData, (value, index) => (
+              <ToggleButton
                 className="recBtn"
                 style={{ maxWidth: "150px", height: "70px" }}
-                key={`${name}_${index}`}
-                onClick={onRecommendationClicked}
+                key={value.title}
+                onClick={() => onRecommendationClicked(value, index)}
+                checked={recommendationButtonState[index]}
+                type="checkbox"
               >
-                {name}
-              </Button>
+                {value.title}
+              </ToggleButton>
             ))}
           </div>
         </div>
       );
     }
   };
+
+  const x = _.map(data.radar.current, (_, key) => (
+    [key, getTargetFromLabel(key)]
+  ))
+  console.log(x)
 
   return (
     <div className="boxBodyRow">
@@ -78,21 +85,27 @@ export const InteractionsContainer = ({
             onChange={onTimePeriodSelected}
             defaultValue={3}
           >
-            <option value={null}>Select period</option>
-            <option value={3}>3 months</option>
-            <option value={6}>6 months</option>
-            <option value={12}>12 months</option>
+            {_.range(1, 13).map((num) => (
+              <option key={num} value={num}>
+                {num} Months
+              </option>
+            ))}
           </Form.Select>
           <Form.Select
             size="sm"
             onChange={onTargetSelected}
-            defaultValue={"weight"}
+            defaultValue={"Weight"}
           >
-            <option value={null}>Select target</option>
-            <option value={"weight"}>Weight</option>
-            <option value={"fitness_age"}>Age</option>
+            {_.map(data.radar.current, (_, key) => (
+              <option key={key} value={getTargetFromLabel(key)}>
+                {key}
+              </option>
+            ))}
+            {/* <option value={"Weight"}>Weight</option>
+            <option value={"metabolic_age"}>Metabolic Age</option>
             <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
             <option value={"fat_mass_perc"}>Fat Mass Percentage</option>
+            <option value={"heart_rate_at_rest"}>Heart Rate at Rest</option> */}
           </Form.Select>
         </div>
         <div className="boxBodyRow gap">
@@ -105,13 +118,15 @@ export const InteractionsContainer = ({
               onChange={onTargetValueChanged}
               tooltip="auto"
             />
-            <p>Selected Value: {targetValue}kg</p>
+            <p>
+              Selected Value: {targetValue} {getTargetUnits(target)}
+            </p>
           </div>
         </div>
       </div>
       <div className="boxBodyColumn">
         <div style={{ paddingBottom: "50px" }} className="boxBodyColumn">
-          {`Recommendations for ${target_to_string[target]}`}
+          {`Recommendations for ${getTargetLabel(target)}`}
           {recommendationButtons()}
         </div>
       </div>
