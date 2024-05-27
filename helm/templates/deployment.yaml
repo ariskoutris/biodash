@@ -35,7 +35,7 @@ spec:
             memory: "2G"
           requests:
             cpu: "0.1"
-            memory: "500M"
+            memory: "1G"
 ---
 apiVersion: apps/v1
 kind: Deployment
