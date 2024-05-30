@@ -27,7 +27,7 @@ RUN apt-get update \
 WORKDIR /srv/backend-app
 
 # Copy only pyproject.toml and poetry.lock (if available) to cache dependencies
-COPY README.md pyproject.toml poetry.lock* /srv/backend-app/
+COPY README.md pyproject.toml /srv/backend-app/
 
 # Disable creation of a virtual environment as the container itself is isolated
 RUN poetry config virtualenvs.create false
