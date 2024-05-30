@@ -93,8 +93,6 @@ export const getProjectedTarget = (target: any, data: any) => {
 export const getTargetMinMax = (target: any, data: any) => {
   const currentValue =
     data?.radar?.current?.[target_to_radar_keys[target]] || null;
-  
-  console.log(target)
 
   if (target === "Weight") {
     return {

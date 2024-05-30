@@ -70,10 +70,6 @@ export const InteractionsContainer = ({
     }
   };
 
-  const x = _.map(data.radar.current, (_, key) => (
-    [key, getTargetFromLabel(key)]
-  ))
-
   return (
     <div className="boxBodyRow">
       <div className="boxBodyColumn">

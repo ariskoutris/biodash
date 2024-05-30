@@ -4,7 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import Button from "react-bootstrap/Button";
 import { postPoints, userLogin } from "./router/resources/data";
 import { getLineChartKeys, transformRecData } from "./utils";
-import { Bar, ChartData, Line, LineData, Radar, TSPoint } from "./types/charts";
+import { Bar, ChartData, Line, LineData, Radar } from "./types/charts";
 import {
   defaultBar,
   defaultChartData,
@@ -23,7 +23,7 @@ function App() {
   const [target, setTarget] = useState<string>("Weight");
 
   const radar_data = useMemo<Radar>(() => {
-    if(lineData.predicted.Weight?.length == 0) return defaultRadar;
+    if(lineData.predicted.Weight?.length === 0) return defaultRadar;
     const _radar_data : any = {
       current : Object.entries(lineData.predicted).map(([key, value]) => {
         return {
