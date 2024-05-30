@@ -33,8 +33,9 @@ function App() {
         return { ...acc, ...curr }
       }, {}),
       predicted: Object.entries(lineData.predicted).map(([key, value]) => {
+        // Use 4.2 as an approximation for the number of weeks in a month
         return {
-          [key]: value[Math.floor(52 / 12 * period)].value,
+          [key]: value[Math.ceil(4.2 * period) - 1].value,
         };
       }).reduce((acc, curr) => { 
         return { ...acc, ...curr }
