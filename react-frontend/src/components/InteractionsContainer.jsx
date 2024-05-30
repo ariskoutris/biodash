@@ -22,7 +22,6 @@ export const InteractionsContainer = ({
     false,
     false,
   ]);
-
   const [targetValue, setTargetValue] = useState(projectedTarget);
 
   useEffect(() => {
@@ -39,7 +38,7 @@ export const InteractionsContainer = ({
   };
 
   const onTargetValueChanged = async (e) => {
-    const goal = e.target.value;
+    const goal = Math.round(e.target.value);
     setTargetValue(goal);
     await getRecommendations(goal);
   };
@@ -74,7 +73,6 @@ export const InteractionsContainer = ({
   const x = _.map(data.radar.current, (_, key) => (
     [key, getTargetFromLabel(key)]
   ))
-  console.log(x)
 
   return (
     <div className="boxBodyRow">

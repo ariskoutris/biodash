@@ -43,7 +43,6 @@ export const MainPage = ({
 
   // if data not ready yet return empty
   if (!readyData) return <></>;
-
   const forecastPlot = (
     <ForecastPlot
       data={data.line}
