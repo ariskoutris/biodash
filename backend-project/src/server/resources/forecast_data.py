@@ -4,6 +4,10 @@ from marshmallow import ValidationError
 
 from ..models.biometrics_prediction import BiometricsPredictor
 from ..schemas import UserSchema, RecommendationsAllSchema
+import json
+import os
+
+dirname = os.path.dirname(__file__)
 
 
 class PredictionsResource(Resource):
@@ -12,32 +16,24 @@ class PredictionsResource(Resource):
     """
 
     def post(self):
-        json_data = request.get_json()
+        request_data = request.get_json()
         try:
-            user_data = UserSchema().load(json_data)
-        except ValidationError as err:
-            return {"message": "Validation error", "errors": err.messages}, 400
+            # This is a dummy example. In a real case scenario we would have a database to query and get the actual
+            # user data
+            with open(os.path.join(dirname, f'users/{request_data["user_name"]}.json'), 'r') as file:
+                json_data = json.load(file)
+                try:
+                    user_data = UserSchema().load(json_data)
+                except ValidationError as err:
+                    return {"message": "Validation error", "errors": err.messages}, 400
+        except FileNotFoundError:
+            return {"message": "User ID not found"}, 400
+        except json.JSONDecodeError:
+            return {"message": "Corrupted file"}, 400
 
         # Save data and generate a user ID
         user_id = BiometricsPredictor.save_user_data(user_data)
         return {"user_id": user_id}, 201
-
-
-class RadarChartResource(Resource):
-    """
-    Uses a user ID to retrieve and process user data for radar chart visualization.
-    """
-
-    def get(self, user_id, period):
-        try:
-            user_data = BiometricsPredictor.get_user_data(user_id)
-        except KeyError:
-            return {"message": "Invalid user ID"}, 404
-
-        current_metrics = BiometricsPredictor.get_current_metrics(user_data)
-        predicted_metrics = BiometricsPredictor.predict_all_metrics(user_data, period)
-        radar_data = {"current": current_metrics, "predicted": predicted_metrics}
-        return radar_data, 200
 
 
 class LineChartResource(Resource):
@@ -80,7 +76,7 @@ class FeatureImportanceResource(Resource):
             user_id=user_id, metric=metric, period=period
         )
         feature_importance_data = {
-            "user_id":user_id,
+            "user_id": user_id,
             "metric": metric,
             "importances": importances,
         }
@@ -103,13 +99,13 @@ class RecommendationsResource(Resource):
         """
         try:
             user_data = BiometricsPredictor.get_user_data(user_id)
+            available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
+            if metric not in available_metrics:
+                return {"message": f"{metric} metric unavailable for user"}, 400
             recommendations = BiometricsPredictor.generate_recommendations(
                 user_id=user_id, target=target, metric=metric, period=period
             )
         except KeyError:
             return {"message": "Invalid user ID"}, 404
 
-        available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
-        if metric not in available_metrics:
-            return {"message": f"{metric} metric unavailable for user"}, 400
         return recommendations, 200

@@ -19,70 +19,11 @@ export function postPoints(url: string): Promise<any> {
     });
 }
 
-export function sendData(): Promise<string | undefined> {
-  const data = {
-    age: 20,
-    gender: "F",
-    biometric_data: [
-      {
-        BiometricName: "Fat mass Perc",
-        MeasuredOnWeek: [19, 39, 46, 50],
-        Value: [40.2, 38.3, 40.6, 39.0],
-      },
-      {
-        BiometricName: "Muscle Mass",
-        MeasuredOnWeek: [19, 39, 46, 50],
-        Value: [53.4, 54.9, 51.7, 53.3],
-      },
-      {
-        BiometricName: "Weight",
-        MeasuredOnWeek: [19, 39, 46, 50],
-        Value: [94.0, 93.7, 91.7, 92.0],
-      },
-    ],
-    training_data: [
-      {
-        exercise: "GOAL exercise in time",
-        equipment: "Synchro",
-        date: "2024-04-03",
-        duration: 900,
-        calories: 163,
-        mets_min: 7.1,
-      },
-      {
-        exercise: "Quick Start",
-        equipment: "Synchro Excite Compact",
-        date: "2024-04-03",
-        duration: 892,
-        calories: 125,
-        mets_min: 6.1,
-      },
-      {
-        exercise: "Calf raise",
-        equipment: "Barbell",
-        date: "2024-04-03",
-        duration: 360,
-        calories: 65,
-        mets_min: 7.0,
-      },
-      {
-        exercise: "Back extension",
-        equipment: "Lower Back Sel",
-        date: "2024-04-03",
-        duration: 287,
-        calories: 28,
-        mets_min: 3.8,
-      },
-      {
-        exercise: "Crunch",
-        equipment: "Abdominal Crunch Sel",
-        date: "2024-04-03",
-        duration: 324,
-        calories: 28,
-        mets_min: 3.3,
-      },
-    ],
-  };
+export function userLogin(user_name: string, password: string): Promise<string | undefined> {
+  const user_info = {
+    "user_name": user_name,
+    "password": password
+  }
   const config = {
     headers: {
       "Content-Type": "application/json",
@@ -90,7 +31,7 @@ export function sendData(): Promise<string | undefined> {
   };
 
   const url = "import";
-  const promise = axiosClient.post<{ user_id: string }>(url, data, config);
+  const promise = axiosClient.post<{ user_id: string }>(url, user_info, config);
   return promise
     .then((res) => {
       return res.data.user_id;
