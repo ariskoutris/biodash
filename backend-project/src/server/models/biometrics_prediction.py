@@ -40,12 +40,11 @@ MAX_HORIZON = 21
 print("Model loaded")
 
 def pad_timeseries(ts, pad_length):
-    pad_values = pd.DataFrame(np.tile(ts.last_values(), (pad_length,1)))
-    return ts.append_values(pad_values) 
+    pad_values = pd.DataFrame(np.tile(ts.last_values(), (pad_length, 1)))
+    return ts.append_values(pad_values)
 
 def get_shap_values(shap_explainer, target, past_cov, horizons):
-    
-    explainability_res = shap_explainer.explain(target, past_cov,  horizons=horizons)
+    explainability_res = shap_explainer.explain(target, past_cov, horizons=horizons)
     comp_list = explainability_res.get_feature_values(horizons[0]).components.to_list()
     drop_comp_list = set([x for x in comp_list if any([x.startswith(y) for y in explainability_res.available_components])])
 
@@ -55,7 +54,7 @@ def get_shap_values(shap_explainer, target, past_cov, horizons):
             importances_df = explainability_res.get_explanation(horizon).pd_dataframe().iloc[-1].T
         else:
             importances_df = pd.concat([importances_df, explainability_res.get_explanation(horizon).pd_dataframe().iloc[-1]], axis=1)
-            
+
     importances_df.columns = horizons
 
     if isinstance(importances_df, pd.Series):
@@ -75,10 +74,36 @@ def get_shap_values(shap_explainer, target, past_cov, horizons):
     for prefix in prefixes:
         lag_cols = [col for col in lag_columns if col.startswith(prefix)]
         importances_df[f'{prefix}'] = importances_df[lag_cols].mean(axis=1)
-        
+
     importances_df = importances_df.drop(columns=lag_columns)
     return importances_df
 
+def preprocess_exercise_data(exercise_data):
+    exercise_types = [x for x in exercise_data.keys() if x != 'week']
+    weeks = pd.Index(exercise_data['week'])
+
+    ex_ts = None
+    for col in exercise_types:
+        values = exercise_data[col]
+        ts = TimeSeries.from_times_and_values(times=weeks, values=values, columns=[col], freq=1)
+        ts = darts_fill_na(ts, fill=0.).astype(np.float32)
+        if ex_ts is None:
+            ex_ts = ts
+        else:
+            ex_ts = ex_ts.stack(ts)
+    return scaler.transform(ex_ts)
+
+def preprocess_biometric_data(biometric_data, covs, metric=None):
+    if metric:
+        metric_data = [x for x in biometric_data if x['BiometricName'] == metric][0]
+    else:
+        metric_data = biometric_data
+
+    weeks = pd.Index(metric_data['MeasuredOnWeek'])
+    values = metric_data['Value']
+    ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
+    bm_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
+    return preprocess_pipeline.transform(bm_ts)
 
 class BiometricsPredictor:
     @staticmethod
@@ -105,51 +130,29 @@ class BiometricsPredictor:
         """
         Compute current metrics from user data.
         """
-        # Placeholder for current user metrics calculation
         biometric_data = user_data.get("biometric_data", {})
-        response = {x['BiometricName']: x['Value'][-1] for x in biometric_data}
-        return response
+        return {x['BiometricName']: x['Value'][-1] for x in biometric_data}
 
     @staticmethod
     def predict_all_metrics(user_data):
         """
         Predict all metrics for the next MAX_HORIZON weeks.
         """
-        # Placeholder for prediction logic using user data and time period
-
         biometric_data = user_data.get("biometric_data", {})
         age = user_data.get("age")
         gender = user_data.get("gender")
         covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
-        
-        exercise_data = user_data.get("agg_training_data", {})
-        exercise_types = [x for x in exercise_data.keys() if x != 'week']
-        weeks = pd.Index(exercise_data['week'])
-        
-        ex_ts = None
-        for col in exercise_types:
-            values = exercise_data[col]
-            ts = TimeSeries.from_times_and_values(times=weeks, values=values, columns=[col], freq=1)
-            ts = darts_fill_na(ts, fill=0.).astype(np.float32)
-            if ex_ts is None:
-                ex_ts = ts
-            else:
-                ex_ts = ex_ts.stack(ts)
-        ex_ts = scaler.transform(ex_ts)
+
+        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
 
         response = {}
         for entry in biometric_data:
-            weeks = pd.Index(entry['MeasuredOnWeek'])
-            values = entry['Value']
-            ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
-            bm_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
-            bm_ts = preprocess_pipeline.transform(bm_ts)
-            
+            bm_ts = preprocess_biometric_data([entry], covs)
             interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
             intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
-            
+
             padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
-            
+
             pred = model.predict(MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts])
             unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
             response[entry['BiometricName']] = unnorm_pred.values().flatten().tolist()[-1]
@@ -160,102 +163,50 @@ class BiometricsPredictor:
     def predict_metric_over_time(user_data, metric, period):
         """
         Predict the values of a specific metric over the specified time period.
-        """
-        
+        """  
         if period > MAX_MONTH:
             raise ValueError(f"Period must be less than or equal to {MAX_MONTH} months")
-        
-        biometric_data = user_data.get("biometric_data", {})
+    
         age = user_data.get("age")
         gender = user_data.get("gender")
         covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
 
-        biometric_data = user_data.get("biometric_data", {})
-        metric_data = [x for x in biometric_data if x['BiometricName'] == metric][0]
+        bm_ts = preprocess_biometric_data(user_data.get("biometric_data", {}), covs, metric)
+        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
 
-        weeks = pd.Index(metric_data['MeasuredOnWeek'])
-        values = metric_data['Value']
-        ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
-        bm_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
-        bm_ts = preprocess_pipeline.transform(bm_ts)
-        
-        exercise_data = user_data.get("agg_training_data", {})
-        exercise_types = [x for x in exercise_data.keys() if x != 'week']
-        weeks = pd.Index(exercise_data['week'])
-        
-        ex_ts = None
-        for col in exercise_types:
-            values = exercise_data[col]
-            ts = TimeSeries.from_times_and_values(times=weeks, values=values, columns=[col], freq=1)
-            ts = darts_fill_na(ts, fill=0.).astype(np.float32)
-            if ex_ts is None:
-                ex_ts = ts
-            else:
-                ex_ts = ex_ts.stack(ts)
-        ex_ts = scaler.transform(ex_ts)
-        
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
         intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
-        
+
         padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
-                
+
         pred = model.predict(ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts])
         unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
 
         return [
-            {
-                "time": week,
-                "value": value
-            } for week, value in zip(range(ceil(WEEKS_PER_MONTH * period)), unnorm_pred.values().flatten().tolist())
+            {"time": week, "value": value}
+            for week, value in zip(range(ceil(WEEKS_PER_MONTH * period)), unnorm_pred.values().flatten().tolist())
         ]
 
     @staticmethod
     def calculate_feature_importances(user_id, metric):
-        """
-        Calculate feature importances for the specified metric.
-        """
-        
         user_data = BiometricsPredictor.get_user_data(user_id)
-        
-        biometric_data = user_data.get("biometric_data", {})
+
         age = user_data.get("age")
         gender = user_data.get("gender")
         covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
 
-        biometric_data = user_data.get("biometric_data", {})
-        metric_data = [x for x in biometric_data if x['BiometricName'] == metric][0]
+        bm_ts = preprocess_biometric_data(user_data.get("biometric_data", {}), covs, metric)
+        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
 
-        weeks = pd.Index(metric_data['MeasuredOnWeek'])
-        values = metric_data['Value']
-        ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
-        bm_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
-        bm_ts = preprocess_pipeline.transform(bm_ts)
-        
-        exercise_data = user_data.get("agg_training_data", {})
-        exercise_types = [x for x in exercise_data.keys() if x != 'week']
-        weeks = pd.Index(exercise_data['week'])
-        
-        ex_ts = None
-        for col in exercise_types:
-            values = exercise_data[col]
-            ts = TimeSeries.from_times_and_values(times=weeks, values=values, columns=[col], freq=1)
-            ts = darts_fill_na(ts, fill=0.).astype(np.float32)
-            if ex_ts is None:
-                ex_ts = ts
-            else:
-                ex_ts = ex_ts.stack(ts)
-        ex_ts = scaler.transform(ex_ts)
-        
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
         intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
-        
+
         padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
-        
-        horizons =[ceil(WEEKS_PER_MONTH * i) for i in range(1, MAX_MONTH + 1)]
+
+        horizons = [ceil(WEEKS_PER_MONTH * i) for i in range(1, MAX_MONTH + 1)]
         shap_df = get_shap_values(shap_explainer, intersected_bm_ts, padded_ex_ts, horizons)
-        shap_dict = shap_df.to_dict()
-        return shap_dict
-    
+        return shap_df.to_dict()
+
     @staticmethod
     def generate_recommendations(user_id, metric, target, period):
         """
