@@ -35,7 +35,7 @@ spec:
             memory: "5G"
           requests:
             cpu: "0.1"
-            memory: "2G"
+            memory: "3G"
 ---
 apiVersion: apps/v1
 kind: Deployment
