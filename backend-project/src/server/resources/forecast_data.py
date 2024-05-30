@@ -73,7 +73,7 @@ class FeatureImportanceResource(Resource):
             return {"message": f"{metric} metric unavailable for user"}, 400
 
         importances = BiometricsPredictor.calculate_feature_importances(
-            user_id=user_id, metric=metric, period=period
+            user_id=user_id, metric=metric
         )
         feature_importance_data = {
             "user_id": user_id,

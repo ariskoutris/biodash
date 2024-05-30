@@ -24,7 +24,8 @@ ChartJS.register(
 );
 
 const ForecastPlot = ({ data, min, max, units, metric, period }) => {
-  const numWeeks = Math.floor((period * 52) / 12);
+  // Use 4.2 as an approximation for the number of weeks in a month
+  const numWeeks = Math.ceil(4.2 * period) - 1;
   const lineData = _.mapValues(data, (val) =>
     _.filter(
       val[getLineChartKeys(metric)] || [],

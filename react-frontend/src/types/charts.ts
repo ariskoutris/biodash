@@ -32,7 +32,9 @@ export interface Line {
 }
 
 export interface Bar {
-  [key: string]: number[];
+  [key: string]: {
+    [week: number]: number;
+  };
 }
 
 export interface ChartData {

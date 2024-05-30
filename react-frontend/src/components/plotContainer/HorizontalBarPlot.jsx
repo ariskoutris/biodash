@@ -21,8 +21,9 @@ ChartJS.register(
 
 const HorizontalBarPlot = ({ data, period }) => {
   const labels = Object.keys(data);
-  const numWeeks = Math.floor((period * 52) / 12);
-  const importances = Object.values(data).map((value) => value[numWeeks]);
+  // Use 4.2 as an approximation for the number of weeks in a month
+  const numWeeks = Math.ceil(4.2 * period);
+  const importances = labels.map(label => data[label][numWeeks]);
   const options = {
     indexAxis: "y",
     elements: {

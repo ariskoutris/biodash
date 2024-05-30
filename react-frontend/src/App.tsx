@@ -62,7 +62,7 @@ function App() {
   useEffect(() => {
     const getLine = async () => {
       // data is fetched for 1 year
-      const _data = await postPoints(`line/${userId}/13`);
+      const _data = await postPoints(`line/${userId}/5`);
       if (_data) {
         setLineData({
           predicted: _data.metrics as LineData,
@@ -83,7 +83,7 @@ function App() {
   useEffect(() => {
     const getBar = async () => {
       const _data = await postPoints(
-        `features/${userId}/${getLineChartKeys(target)}/13`
+        `features/${userId}/${getLineChartKeys(target)}/5`
       );
       setBarData((_data?.importances as Bar) || defaultBar);
     };
