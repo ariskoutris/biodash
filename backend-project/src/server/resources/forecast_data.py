@@ -35,7 +35,7 @@ class RadarChartResource(Resource):
             return {"message": "Invalid user ID"}, 404
 
         current_metrics = BiometricsPredictor.get_current_metrics(user_data)
-        predicted_metrics = BiometricsPredictor.predict_all_metrics(user_data, period)
+        predicted_metrics = BiometricsPredictor.predict_all_metrics(user_data)
         radar_data = {"current": current_metrics, "predicted": predicted_metrics}
         return radar_data, 200
 
@@ -77,7 +77,7 @@ class FeatureImportanceResource(Resource):
             return {"message": f"{metric} metric unavailable for user"}, 400
 
         importances = BiometricsPredictor.calculate_feature_importances(
-            user_id=user_id, metric=metric, period=period
+            user_id=user_id, metric=metric
         )
         feature_importance_data = {
             "user_id":user_id,

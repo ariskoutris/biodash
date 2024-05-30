@@ -85,7 +85,7 @@ export const InteractionsContainer = ({
             onChange={onTimePeriodSelected}
             defaultValue={3}
           >
-            {_.range(1, 13).map((num) => (
+            {_.range(1, 6).map((num) => (
               <option key={num} value={num}>
                 {num} Months
               </option>
