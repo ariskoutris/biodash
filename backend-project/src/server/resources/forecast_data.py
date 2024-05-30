@@ -20,7 +20,9 @@ class PredictionsResource(Resource):
         try:
             # This is a dummy example. In a real case scenario we would have a database to query and get the actual
             # user data
-            with open(os.path.join(dirname, f'users/{request_data["user_name"]}.json'), 'r') as file:
+            with open(
+                os.path.join(dirname, f'users/{request_data["user_name"]}.json'), "r"
+            ) as file:
                 json_data = json.load(file)
                 try:
                     user_data = UserSchema().load(json_data)
@@ -46,13 +48,17 @@ class LineChartResource(Resource):
             user_data = BiometricsPredictor.get_user_data(user_id)
         except KeyError:
             return {"message": "Invalid user ID"}, 404
-        available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
+        available_metrics = [
+            x["BiometricName"] for x in user_data.get("biometric_data", {})
+        ]
         line_chart_data = {"user_id": user_id, "period": period, "metrics": {}}
         for metric in available_metrics:
             if metric not in available_metrics:
-                return {"message": f"{metric} metric unavailable for user_id: {user_id}"}, 400
-            line_chart_data["metrics"][metric] = BiometricsPredictor.predict_metric_over_time(
-                user_data, metric, period
+                return {
+                    "message": f"{metric} metric unavailable for user_id: {user_id}"
+                }, 400
+            line_chart_data["metrics"][metric] = (
+                BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
             )
         return line_chart_data, 200
 
@@ -68,7 +74,9 @@ class FeatureImportanceResource(Resource):
         except KeyError:
             return {"message": "Invalid user ID"}, 404
 
-        available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
+        available_metrics = [
+            x["BiometricName"] for x in user_data.get("biometric_data", {})
+        ]
         if metric not in available_metrics:
             return {"message": f"{metric} metric unavailable for user"}, 400
 
@@ -99,7 +107,9 @@ class RecommendationsResource(Resource):
         """
         try:
             user_data = BiometricsPredictor.get_user_data(user_id)
-            available_metrics = [x["BiometricName"] for x in user_data.get("biometric_data", {})]
+            available_metrics = [
+                x["BiometricName"] for x in user_data.get("biometric_data", {})
+            ]
             if metric not in available_metrics:
                 return {"message": f"{metric} metric unavailable for user"}, 400
             recommendations = BiometricsPredictor.generate_recommendations(

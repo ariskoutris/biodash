@@ -13,6 +13,7 @@ from darts.utils.missing_values import fill_missing_values as darts_fill_na
 from darts.explainability.shap_explainer import ShapExplainer
 
 import warnings
+
 warnings.filterwarnings("ignore", message=".*X has feature names, but.*")
 
 _data_store = {}
@@ -27,10 +28,10 @@ past_cov_path = os.path.join(dirname, "../weights/weight_past_cov.pkl")
 shap_explainer_path = os.path.join(dirname, "../weights/weight_shap_explainer.pkl")
 
 model = RegressionModel.load(model_path)
-preprocess_pipeline = pickle.load(open(preprocessor_path, 'rb'))
-scaler = pickle.load(open(scaler_path, 'rb'))
-target = pickle.load(open(target_path, 'rb'))
-past_cov = pickle.load(open(past_cov_path, 'rb'))
+preprocess_pipeline = pickle.load(open(preprocessor_path, "rb"))
+scaler = pickle.load(open(scaler_path, "rb"))
+target = pickle.load(open(target_path, "rb"))
+past_cov = pickle.load(open(past_cov_path, "rb"))
 shap_explainer = ShapExplainer(model, target, past_cov)
 
 WEEKS_PER_MONTH = 4.2
@@ -39,21 +40,37 @@ MAX_HORIZON = 21
 
 print("Model loaded")
 
+
 def pad_timeseries(ts, pad_length):
     pad_values = pd.DataFrame(np.tile(ts.last_values(), (pad_length, 1)))
     return ts.append_values(pad_values)
 
+
 def get_shap_values(shap_explainer, target, past_cov, horizons):
     explainability_res = shap_explainer.explain(target, past_cov, horizons=horizons)
     comp_list = explainability_res.get_feature_values(horizons[0]).components.to_list()
-    drop_comp_list = set([x for x in comp_list if any([x.startswith(y) for y in explainability_res.available_components])])
+    drop_comp_list = set(
+        [
+            x
+            for x in comp_list
+            if any([x.startswith(y) for y in explainability_res.available_components])
+        ]
+    )
 
     importances_df = pd.DataFrame([])
     for horizon in horizons:
         if len(importances_df) == 0:
-            importances_df = explainability_res.get_explanation(horizon).pd_dataframe().iloc[-1].T
+            importances_df = (
+                explainability_res.get_explanation(horizon).pd_dataframe().iloc[-1].T
+            )
         else:
-            importances_df = pd.concat([importances_df, explainability_res.get_explanation(horizon).pd_dataframe().iloc[-1]], axis=1)
+            importances_df = pd.concat(
+                [
+                    importances_df,
+                    explainability_res.get_explanation(horizon).pd_dataframe().iloc[-1],
+                ],
+                axis=1,
+            )
 
     importances_df.columns = horizons
 
@@ -61,49 +78,56 @@ def get_shap_values(shap_explainer, target, past_cov, horizons):
         importances_df = importances_df.to_frame()
         importances_df.columns = [horizons[0]]
     importances_df.reset_index(inplace=True)
-    importances_df = importances_df[~importances_df['component'].isin(drop_comp_list)]
+    importances_df = importances_df[~importances_df["component"].isin(drop_comp_list)]
 
     importances_df = importances_df.T
     importances_df.columns = importances_df.iloc[0]
     importances_df = importances_df.drop(importances_df.index[0])
-    importances_df.columns.name = 'Horizon'
+    importances_df.columns.name = "Horizon"
 
-    lag_columns = [col for col in importances_df.columns if 'lag-' in col]
-    prefixes = set(col.rsplit('_', 1)[0] for col in lag_columns)
+    lag_columns = [col for col in importances_df.columns if "lag-" in col]
+    prefixes = set(col.rsplit("_", 1)[0] for col in lag_columns)
 
     for prefix in prefixes:
         lag_cols = [col for col in lag_columns if col.startswith(prefix)]
-        importances_df[f'{prefix}'] = importances_df[lag_cols].mean(axis=1)
+        importances_df[f"{prefix}"] = importances_df[lag_cols].mean(axis=1)
 
     importances_df = importances_df.drop(columns=lag_columns)
     return importances_df
 
+
 def preprocess_exercise_data(exercise_data):
-    exercise_types = [x for x in exercise_data.keys() if x != 'week']
-    weeks = pd.Index(exercise_data['week'])
+    exercise_types = [x for x in exercise_data.keys() if x != "week"]
+    weeks = pd.Index(exercise_data["week"])
 
     ex_ts = None
     for col in exercise_types:
         values = exercise_data[col]
-        ts = TimeSeries.from_times_and_values(times=weeks, values=values, columns=[col], freq=1)
-        ts = darts_fill_na(ts, fill=0.).astype(np.float32)
+        ts = TimeSeries.from_times_and_values(
+            times=weeks, values=values, columns=[col], freq=1
+        )
+        ts = darts_fill_na(ts, fill=0.0).astype(np.float32)
         if ex_ts is None:
             ex_ts = ts
         else:
             ex_ts = ex_ts.stack(ts)
     return scaler.transform(ex_ts)
 
+
 def preprocess_biometric_data(biometric_data, covs, metric=None):
     if metric:
-        metric_data = [x for x in biometric_data if x['BiometricName'] == metric][0]
+        metric_data = [x for x in biometric_data if x["BiometricName"] == metric][0]
     else:
         metric_data = biometric_data
 
-    weeks = pd.Index(metric_data['MeasuredOnWeek'])
-    values = metric_data['Value']
-    ts = TimeSeries.from_times_and_values(times=weeks, values=values, static_covariates=covs, freq=1)
-    bm_ts = darts_fill_na(ts, fill='auto').astype(np.float32)
+    weeks = pd.Index(metric_data["MeasuredOnWeek"])
+    values = metric_data["Value"]
+    ts = TimeSeries.from_times_and_values(
+        times=weeks, values=values, static_covariates=covs, freq=1
+    )
+    bm_ts = darts_fill_na(ts, fill="auto").astype(np.float32)
     return preprocess_pipeline.transform(bm_ts)
+
 
 class BiometricsPredictor:
     @staticmethod
@@ -131,7 +155,7 @@ class BiometricsPredictor:
         Compute current metrics from user data.
         """
         biometric_data = user_data.get("biometric_data", {})
-        return {x['BiometricName']: x['Value'][-1] for x in biometric_data}
+        return {x["BiometricName"]: x["Value"][-1] for x in biometric_data}
 
     @staticmethod
     def predict_all_metrics(user_data):
@@ -141,7 +165,7 @@ class BiometricsPredictor:
         biometric_data = user_data.get("biometric_data", {})
         age = user_data.get("age")
         gender = user_data.get("gender")
-        covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
+        covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
 
         ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
 
@@ -153,9 +177,13 @@ class BiometricsPredictor:
 
             padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
 
-            pred = model.predict(MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts])
+            pred = model.predict(
+                MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts]
+            )
             unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
-            response[entry['BiometricName']] = unnorm_pred.values().flatten().tolist()[-1]
+            response[entry["BiometricName"]] = (
+                unnorm_pred.values().flatten().tolist()[-1]
+            )
 
         return response
 
@@ -163,15 +191,17 @@ class BiometricsPredictor:
     def predict_metric_over_time(user_data, metric, period):
         """
         Predict the values of a specific metric over the specified time period.
-        """  
+        """
         if period > MAX_MONTH:
             raise ValueError(f"Period must be less than or equal to {MAX_MONTH} months")
-    
+
         age = user_data.get("age")
         gender = user_data.get("gender")
-        covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
+        covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
 
-        bm_ts = preprocess_biometric_data(user_data.get("biometric_data", {}), covs, metric)
+        bm_ts = preprocess_biometric_data(
+            user_data.get("biometric_data", {}), covs, metric
+        )
         ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
 
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
@@ -179,12 +209,17 @@ class BiometricsPredictor:
 
         padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
 
-        pred = model.predict(ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts])
+        pred = model.predict(
+            ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts]
+        )
         unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
 
         return [
             {"time": week, "value": value}
-            for week, value in zip(range(ceil(WEEKS_PER_MONTH * period)), unnorm_pred.values().flatten().tolist())
+            for week, value in zip(
+                range(ceil(WEEKS_PER_MONTH * period)),
+                unnorm_pred.values().flatten().tolist(),
+            )
         ]
 
     @staticmethod
@@ -193,9 +228,11 @@ class BiometricsPredictor:
 
         age = user_data.get("age")
         gender = user_data.get("gender")
-        covs = pd.DataFrame(data={'Gender': [gender], 'Age': [age]})
+        covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
 
-        bm_ts = preprocess_biometric_data(user_data.get("biometric_data", {}), covs, metric)
+        bm_ts = preprocess_biometric_data(
+            user_data.get("biometric_data", {}), covs, metric
+        )
         ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
 
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
@@ -204,7 +241,9 @@ class BiometricsPredictor:
         padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
 
         horizons = [ceil(WEEKS_PER_MONTH * i) for i in range(1, MAX_MONTH + 1)]
-        shap_df = get_shap_values(shap_explainer, intersected_bm_ts, padded_ex_ts, horizons)
+        shap_df = get_shap_values(
+            shap_explainer, intersected_bm_ts, padded_ex_ts, horizons
+        )
         return shap_df.to_dict()
 
     @staticmethod
@@ -222,20 +261,26 @@ class BiometricsPredictor:
                     "recommendation": "Leg workouts per week",
                     "value": random.uniform(1, 5),
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data),
-                    "new_ts": BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
+                    "new_ts": BiometricsPredictor.predict_metric_over_time(
+                        user_data, metric, period
+                    ),
                 },
                 "2": {
                     "recommendation": "Cardio Time per week (minutes)",
                     "value": random.uniform(60, 300),
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data),
-                    "new_ts": BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
+                    "new_ts": BiometricsPredictor.predict_metric_over_time(
+                        user_data, metric, period
+                    ),
                 },
                 "3": {
                     "recommendation": "Calories per workout (kcal)",
                     "value": random.uniform(300, 800),
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data),
-                    "new_ts": BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
-                }
+                    "new_ts": BiometricsPredictor.predict_metric_over_time(
+                        user_data, metric, period
+                    ),
+                },
             },
             "target": target,
             "metric": metric,
