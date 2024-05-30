@@ -1,10 +1,10 @@
 import "./App.scss";
 import { MainPage } from "./pages/mainPage/mainPage";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Button from "react-bootstrap/Button";
-import { postPoints, sendData } from "./router/resources/data";
+import { postPoints, userLogin } from "./router/resources/data";
 import { getLineChartKeys, transformRecData } from "./utils";
-import { Bar, ChartData, Line, LineData, Radar } from "./types/charts";
+import { Bar, ChartData, Line, LineData, Radar, TSPoint } from "./types/charts";
 import {
   defaultBar,
   defaultChartData,
@@ -15,35 +15,49 @@ import { Recommendation, Recommendations } from "./types/recommendations";
 
 function App() {
   const [data, setData] = useState<ChartData>(defaultChartData);
-  const [radarData, setRadarData] = useState<Radar>(defaultRadar);
   const [lineData, setLineData] = useState<Line>(defaultLine);
   const [barData, setBarData] = useState<Bar>(defaultBar);
   const [recData, setRecData] = useState<Recommendations>([]);
-
   const [userId, setUserId] = useState<string | null>(null);
   const [period, setPeriod] = useState<number>(3); // in months
   const [target, setTarget] = useState<string>("Weight");
 
+  const radar_data = useMemo<Radar>(() => {
+    if(lineData.predicted.Weight?.length == 0) return defaultRadar;
+    const _radar_data : any = {
+      current : Object.entries(lineData.predicted).map(([key, value]) => {
+        return {
+          [key]: value[0].value,
+        };
+      }).reduce((acc, curr) => { 
+        return { ...acc, ...curr }
+      }, {}),
+      predicted: Object.entries(lineData.predicted).map(([key, value]) => {
+        return {
+          [key]: value[Math.floor(52 / 12 * period)].value,
+        };
+      }).reduce((acc, curr) => { 
+        return { ...acc, ...curr }
+      }, {})
+    };
+    if(!!lineData.recommended) {
+      _radar_data["recommended"] = Object.entries(lineData.recommended).map(([key, value]) => {
+        return {
+          [key]: value.value,
+        };
+      }).reduce((acc, curr) => { 
+        return { ...acc, ...curr }
+      }, {});
+    }
+    return _radar_data;
+  }, [lineData, period]);
+
   // here fetch and set the data
-  const _onImportClick = async (e: any) => {
+  const _onLoginClick = async (e: any) => {
     e.stopPropagation();
-    const _id = (await sendData()) as any;
+    const _id = (await userLogin("dummy", "wowpassword")) as any;
     setUserId(_id || false);
   };
-
-  useEffect(() => {
-    const getRadar = async () => {
-      const _data = await postPoints(`radar/${userId}/${period}`);
-      setRadarData(_data as Radar);
-    };
-
-    if (userId) {
-      getRadar().catch((e) => {
-        console.error(e);
-        setRadarData(defaultRadar);
-      });
-    }
-  }, [period, userId]);
 
   useEffect(() => {
     const getLine = async () => {
@@ -84,11 +98,11 @@ function App() {
 
   useEffect(() => {
     setData({
-      radar: radarData,
+      radar: radar_data,
       line: lineData,
       bar: barData,
     });
-  }, [radarData, lineData, barData]);
+  }, [radar_data, lineData, barData]);
 
   const getRecommendations = async (goal: number) => {
     await postPoints(
@@ -129,7 +143,7 @@ function App() {
         </div>
         <header className="App-header"> TechnoGym Assistant </header>
         <div className="headerContainerItem">
-          <Button onClick={_onImportClick}>Import Data</Button>
+          <Button onClick={_onLoginClick}>Login</Button>
         </div>
       </div>
       <MainPage

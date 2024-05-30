@@ -13,7 +13,7 @@ export interface Radar {
   recommended?: RadarData;
 }
 
-interface TSPoint {
+export interface TSPoint {
   time: number,
   value: number
 }
