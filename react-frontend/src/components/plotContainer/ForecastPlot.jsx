@@ -51,7 +51,7 @@ const ForecastPlot = ({ data, min, max, units, metric, period }) => {
       x: {
         title: {
           display: true,
-          text: "Time/weeks",
+          text: "Time (weeks)",
         },
       },
     },
