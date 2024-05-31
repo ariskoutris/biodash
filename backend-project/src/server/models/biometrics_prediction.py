@@ -17,6 +17,7 @@ import warnings
 warnings.filterwarnings("ignore", message=".*X has feature names, but.*")
 
 _data_store = {}
+_feature_importances = {}
 
 dirname = os.path.dirname(__file__)
 
@@ -41,8 +42,15 @@ MAX_HORIZON = 21
 print("Model loaded")
 
 
-def pad_timeseries(ts, pad_length):
-    pad_values = pd.DataFrame(np.tile(ts.last_values(), (pad_length, 1)))
+def pad_timeseries(ts, pad_length, feature_adjustments=None):
+    pad_ts = ts.last_values()
+    feature_names = ts.columns.tolist()
+    if feature_adjustments:
+        feature, adjustment = feature_adjustments
+        feature_stripped = "_".join(feature.split("_")[:-1])
+        index = feature_names.index(feature_stripped)
+        pad_ts[index] += adjustment
+    pad_values = pd.DataFrame(np.tile(pad_ts, (pad_length, 1)))
     return ts.append_values(pad_values)
 
 
@@ -158,7 +166,7 @@ class BiometricsPredictor:
         return {x["BiometricName"]: x["Value"][-1] for x in biometric_data}
 
     @staticmethod
-    def predict_all_metrics(user_data):
+    def predict_all_metrics(user_data, feature_adjustments=None):
         """
         Predict all metrics for the next MAX_HORIZON weeks.
         """
@@ -171,11 +179,11 @@ class BiometricsPredictor:
 
         response = {}
         for entry in biometric_data:
-            bm_ts = preprocess_biometric_data([entry], covs)
+            bm_ts = preprocess_biometric_data(entry, covs)
             interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
             intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
 
-            padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
+            padded_ex_ts = pad_timeseries(ts=interesected_ex_ts, pad_length=50, feature_adjustments=feature_adjustments)
 
             pred = model.predict(
                 MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts]
@@ -188,7 +196,7 @@ class BiometricsPredictor:
         return response
 
     @staticmethod
-    def predict_metric_over_time(user_data, metric, period):
+    def predict_metric_over_time(user_data, metric, period, feature_adjustments=None):
         """
         Predict the values of a specific metric over the specified time period.
         """
@@ -207,11 +215,12 @@ class BiometricsPredictor:
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
         intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
 
-        padded_ex_ts = pad_timeseries(interesected_ex_ts, 50)
-
+        padded_ex_ts = pad_timeseries(ts=interesected_ex_ts, pad_length=50, feature_adjustments=feature_adjustments)
+        print(padded_ex_ts)
         pred = model.predict(
             ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts]
         )
+        print(pred)
         unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
 
         return [
@@ -224,6 +233,10 @@ class BiometricsPredictor:
 
     @staticmethod
     def calculate_feature_importances(user_id, metric):
+        
+        if user_id in _feature_importances and metric in _feature_importances[user_id]:
+            return _feature_importances[user_id][metric]
+        
         user_data = BiometricsPredictor.get_user_data(user_id)
 
         age = user_data.get("age")
@@ -244,7 +257,13 @@ class BiometricsPredictor:
         shap_df = get_shap_values(
             shap_explainer, intersected_bm_ts, padded_ex_ts, horizons
         )
-        return shap_df.to_dict()
+        
+        shap_dict = shap_df.to_dict()
+        
+        if user_id not in _feature_importances:
+            _feature_importances[user_id] = {}  
+        _feature_importances[user_id][metric] = shap_dict
+        return shap_dict
 
     @staticmethod
     def generate_recommendations(user_id, metric, target, period):
@@ -253,32 +272,45 @@ class BiometricsPredictor:
         """
         # Placeholder logic for generating recommendations for the user with the defined target
         user_data = BiometricsPredictor.get_user_data(user_id)
+        feature_importances_dict = _feature_importances[user_id][metric]
+        feature_importances = [(key, feature_importances_dict[key][int(ceil(WEEKS_PER_MONTH * period))]) for key in feature_importances_dict.keys()]
+        
+        # Set value of increase flag depending on whether we want to increase or decrease target
+        increase_flag = True
+        
+        # Should sort based on absolute value instead
+        feature_importances.sort(key=lambda x: x[1], reverse=increase_flag)
+        top_features = feature_importances[:3]
+        
+        names = [x[0] for x in top_features]
+        importances = [x[1] for x in top_features]
+        feature_adjustments = top_features
 
         return {
             "user_id": user_id,
             "recommendations": {
                 "1": {
-                    "recommendation": "Leg workouts per week",
-                    "value": random.uniform(1, 5),
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data),
+                    "recommendation": names[0],
+                    "value": importances[1],
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, feature_adjustments[0]),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
-                        user_data, metric, period
+                        user_data, metric, period, feature_adjustments[0]
                     ),
                 },
                 "2": {
-                    "recommendation": "Cardio Time per week (minutes)",
-                    "value": random.uniform(60, 300),
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data),
+                    "recommendation": names[1],
+                    "value": importances[1],
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, feature_adjustments[1]),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
-                        user_data, metric, period
+                        user_data, metric, period, feature_adjustments[1]
                     ),
                 },
                 "3": {
-                    "recommendation": "Calories per workout (kcal)",
-                    "value": random.uniform(300, 800),
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data),
+                    "recommendation": names[2],
+                    "value": importances[1],
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, feature_adjustments[2]),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
-                        user_data, metric, period
+                        user_data, metric, period, feature_adjustments[2]
                     ),
                 },
             },
