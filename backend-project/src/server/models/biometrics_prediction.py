@@ -1,5 +1,3 @@
-import math
-import random
 from uuid import uuid4
 import pickle
 import numpy as np
@@ -183,8 +181,13 @@ class BiometricsPredictor:
             interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
             intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
 
-            padded_ex_ts = pad_timeseries(ts=interesected_ex_ts, pad_length=50, feature_adjustments=feature_adjustments)
-
+            padded_ex_ts = pad_timeseries(ts=interesected_ex_ts, pad_length=50)
+            if feature_adjustments:
+                ex_df = padded_ex_ts.pd_dataframe()
+                for feature, adjustment in feature_adjustments:
+                    feature_stripped = "_".join(feature.split("_")[:-1])
+                    ex_df[feature_stripped] += adjustment
+                padded_ex_ts = TimeSeries.from_dataframe(ex_df)
             pred = model.predict(
                 MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts]
             )
@@ -215,12 +218,16 @@ class BiometricsPredictor:
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
         intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
 
-        padded_ex_ts = pad_timeseries(ts=interesected_ex_ts, pad_length=50, feature_adjustments=feature_adjustments)
-        print(padded_ex_ts)
+        padded_ex_ts = pad_timeseries(ts=interesected_ex_ts, pad_length=50)
+        if feature_adjustments:
+            ex_df = padded_ex_ts.pd_dataframe()
+            for feature, adjustment in feature_adjustments:
+                feature_stripped = "_".join(feature.split("_")[:-1])
+                ex_df[feature_stripped] += adjustment
+            padded_ex_ts = TimeSeries.from_dataframe(ex_df)
         pred = model.predict(
             ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts]
         )
-        print(pred)
         unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
 
         return [
@@ -270,21 +277,22 @@ class BiometricsPredictor:
         """
         Calculate feature importances for the specified metric, desired target and period.
         """
-        # Placeholder logic for generating recommendations for the user with the defined target
         user_data = BiometricsPredictor.get_user_data(user_id)
         feature_importances_dict = _feature_importances[user_id][metric]
         feature_importances = [(key, feature_importances_dict[key][int(ceil(WEEKS_PER_MONTH * period))]) for key in feature_importances_dict.keys()]
         
-        # Set value of increase flag depending on whether we want to increase or decrease target
+        #TODO: Set value of increase flag depending on whether we want to increase or decrease target
         increase_flag = True
         
-        # Should sort based on absolute value instead
+        #TODO: Should sort based on absolute value instead
         feature_importances.sort(key=lambda x: x[1], reverse=increase_flag)
         top_features = feature_importances[:3]
         
         names = [x[0] for x in top_features]
         importances = [x[1] for x in top_features]
-        feature_adjustments = top_features
+
+        #feature_adjustments = top_features
+        feature_adjustments = [(x[0], 1000*x[1]) for x in top_features]
 
         return {
             "user_id": user_id,
@@ -292,25 +300,25 @@ class BiometricsPredictor:
                 "1": {
                     "recommendation": names[0],
                     "value": importances[1],
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, feature_adjustments[0]),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[0]]),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
-                        user_data, metric, period, feature_adjustments[0]
+                        user_data, metric, period, [feature_adjustments[0]]
                     ),
                 },
                 "2": {
                     "recommendation": names[1],
                     "value": importances[1],
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, feature_adjustments[1]),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[1]]),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
-                        user_data, metric, period, feature_adjustments[1]
+                        user_data, metric, period, [feature_adjustments[1]]
                     ),
                 },
                 "3": {
                     "recommendation": names[2],
                     "value": importances[1],
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, feature_adjustments[2]),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[2]]),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
-                        user_data, metric, period, feature_adjustments[2]
+                        user_data, metric, period, [feature_adjustments[2]]
                     ),
                 },
             },
