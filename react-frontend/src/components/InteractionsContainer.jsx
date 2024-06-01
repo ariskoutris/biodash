@@ -40,7 +40,8 @@ export const InteractionsContainer = ({
   const onTargetValueChanged = async (e) => {
     const goal = Math.round(e.target.value);
     setTargetValue(goal);
-    await getRecommendations(goal);
+    const predictedValue = Math.round(data.radar.predicted[target]);
+    await getRecommendations(goal, predictedValue);
   };
 
   const recommendationButtons = () => {

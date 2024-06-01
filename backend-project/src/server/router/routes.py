@@ -30,6 +30,6 @@ def add_routes(app):
     # Resource for getting recommendations using a user ID, metric, target, and period
     api.add_resource(
         res.forecast_data.RecommendationsResource,
-        API + "recommendations/<string:user_id>/<string:metric>/<int:target>/<int:period>",
+        API + "recommendations/<string:user_id>/<string:metric>/<int:period>/<int:target>/<int:predicted>",
         methods=["GET"],
     )

@@ -1,5 +1,4 @@
 from uuid import uuid4
-import pickle
 import numpy as np
 import pandas as pd
 from math import ceil
@@ -269,30 +268,27 @@ class BiometricsPredictor:
         return shap_dict
 
     @staticmethod
-    def generate_recommendations(user_id, metric, target, period):
+    def generate_recommendations(user_id, metric, period, target, predicted):
         """
         Calculate feature importances for the specified metric, desired target and period.
         """
         user_data = BiometricsPredictor.get_user_data(user_id)
+        
         feature_importances_dict = _feature_importances[user_id][metric]
         feature_importances = [(key, feature_importances_dict[key][int(ceil(WEEKS_PER_MONTH * period))]) for key in feature_importances_dict.keys()]
+        feature_importances = [(k,v) for k,v in feature_importances if "statcov" not in k]
         
-        #TODO: Set value of increase flag depending on whether we want to increase or decrease target
-        increase_flag = True
+        increase_flag = target > predicted
         
-        #TODO: Should sort based on absolute value instead
         feature_importances.sort(key=lambda x: x[1], reverse=increase_flag)
-        
-        # Filter out statcov features
-        controllable_features = [x for x in feature_importances if "statcov" not in x[0]]
     
-        top_features = controllable_features[:3]
+        top_features = feature_importances[:3]
         
         names = [x[0] for x in top_features]
         importances = [x[1] for x in top_features]
 
-        #feature_adjustments = top_features
-        feature_adjustments = [(x[0], 1000*x[1]) for x in top_features]
+        scaling_factor = abs(target - predicted) / abs(target + predicted)
+        feature_adjustments = [(x[0], scaling_factor * 100) for x in top_features]
 
         return {
             "user_id": user_id,

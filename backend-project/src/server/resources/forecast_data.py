@@ -96,15 +96,17 @@ class RecommendationsResource(Resource):
     Uses a user ID to retrieve user data and generate recommendations for a specified metric, target and period.
     """
 
-    def get(self, user_id, metric, target, period):
+    def get(self, user_id, metric, period, target, predicted):
         """
         Get recommendations for a user based on their biometric data and their goals.
         :param user_id: user ID
         :param metric: Which metric to generate recommendations for
-        :param target: What is the user's goal metric value
         :param period: In how many weeks should the goal be achieved
+        :param target: What is the user's goal metric value
+        :param predicted: What is the predicted value for the metric over the period
         :return: (recommendations, status code)
         """
+        print(target, predicted)
         try:
             user_data = BiometricsPredictor.get_user_data(user_id)
         except KeyError:
@@ -116,7 +118,7 @@ class RecommendationsResource(Resource):
         if metric not in available_metrics:
             return {"message": f"{metric} metric unavailable for user"}, 400
         recommendations = BiometricsPredictor.generate_recommendations(
-            user_id=user_id, target=target, metric=metric, period=period
+            user_id=user_id, target=target, metric=metric, period=period, predicted=predicted
         )
 
         return recommendations, 200
