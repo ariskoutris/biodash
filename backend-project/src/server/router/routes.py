@@ -26,8 +26,8 @@ def add_routes(app):
         API + "features/<string:user_id>/<string:metric>/<int:period>",
         methods=["GET"],
     )
-
-    # Resource for getting feature importance data using a user ID, metric, and period
+    
+    # Resource for getting recommendations using a user ID, metric, target, and period
     api.add_resource(
         res.forecast_data.RecommendationsResource,
         API + "recommendations/<string:user_id>/<string:metric>/<int:target>/<int:period>",

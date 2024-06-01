@@ -6,32 +6,27 @@ from math import ceil
 import os
 
 from darts.timeseries import TimeSeries
-from darts.models import RegressionModel
 from darts.utils.missing_values import fill_missing_values as darts_fill_na
-from darts.explainability.shap_explainer import ShapExplainer
 
+from .model import ModelLoader
 import warnings
 
 warnings.filterwarnings("ignore", message=".*X has feature names, but.*")
 
 _data_store = {}
 _feature_importances = {}
+models = {}
 
-dirname = os.path.dirname(__file__)
+file_dir = os.path.dirname(__file__)
+par_dir = os.path.abspath(os.path.join(file_dir, os.pardir))
+weights_dir = os.path.join(par_dir, "weights")
 
-model_path = os.path.join(dirname, "../weights/weight_model.pkl")
-preprocessor_path = os.path.join(dirname, "../weights/weight_preprocessor.pkl")
-scaler_path = os.path.join(dirname, "../weights/weight_scaler.pkl")
-target_path = os.path.join(dirname, "../weights/weight_target.pkl")
-past_cov_path = os.path.join(dirname, "../weights/weight_past_cov.pkl")
-shap_explainer_path = os.path.join(dirname, "../weights/weight_shap_explainer.pkl")
-
-model = RegressionModel.load(model_path)
-preprocess_pipeline = pickle.load(open(preprocessor_path, "rb"))
-scaler = pickle.load(open(scaler_path, "rb"))
-target = pickle.load(open(target_path, "rb"))
-past_cov = pickle.load(open(past_cov_path, "rb"))
-shap_explainer = ShapExplainer(model, target, past_cov)
+models["Weight"] = ModelLoader(weights_dir, "Weight")
+models["Muscle Mass"] = ModelLoader(weights_dir, "Muscle Mass")
+models["Fat mass Perc"] = ModelLoader(weights_dir, "Fat mass Perc")
+models["Weight"].load()
+models["Muscle Mass"].load()
+models["Fat mass Perc"].load()
 
 WEEKS_PER_MONTH = 4.2
 MAX_MONTH = 5
@@ -102,7 +97,7 @@ def get_shap_values(shap_explainer, target, past_cov, horizons):
     return importances_df
 
 
-def preprocess_exercise_data(exercise_data):
+def preprocess_exercise_data(exercise_data, scaler):
     exercise_types = [x for x in exercise_data.keys() if x != "week"]
     weeks = pd.Index(exercise_data["week"])
 
@@ -120,7 +115,7 @@ def preprocess_exercise_data(exercise_data):
     return scaler.transform(ex_ts)
 
 
-def preprocess_biometric_data(biometric_data, covs, metric=None):
+def preprocess_biometric_data(biometric_data, covs, preprocessor, metric=None):
     if metric:
         metric_data = [x for x in biometric_data if x["BiometricName"] == metric][0]
     else:
@@ -132,7 +127,7 @@ def preprocess_biometric_data(biometric_data, covs, metric=None):
         times=weeks, values=values, static_covariates=covs, freq=1
     )
     bm_ts = darts_fill_na(ts, fill="auto").astype(np.float32)
-    return preprocess_pipeline.transform(bm_ts)
+    return preprocessor.transform(bm_ts)
 
 
 class BiometricsPredictor:
@@ -173,11 +168,12 @@ class BiometricsPredictor:
         gender = user_data.get("gender")
         covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
 
-        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
-
         response = {}
         for entry in biometric_data:
-            bm_ts = preprocess_biometric_data(entry, covs)
+            metric = entry["BiometricName"]
+            
+            ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}), models[metric].scaler)
+            bm_ts = preprocess_biometric_data(entry, covs, models[metric].preprocess_pipeline)
             interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
             intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
 
@@ -188,10 +184,10 @@ class BiometricsPredictor:
                     feature_stripped = "_".join(feature.split("_")[:-1])
                     ex_df[feature_stripped] += adjustment
                 padded_ex_ts = TimeSeries.from_dataframe(ex_df)
-            pred = model.predict(
+            pred = models[metric].model.predict(
                 MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts]
             )
-            unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
+            unnorm_pred = models[metric].preprocess_pipeline.inverse_transform(pred)[0]
             response[entry["BiometricName"]] = (
                 unnorm_pred.values().flatten().tolist()[-1]
             )
@@ -211,9 +207,9 @@ class BiometricsPredictor:
         covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
 
         bm_ts = preprocess_biometric_data(
-            user_data.get("biometric_data", {}), covs, metric
+            user_data.get("biometric_data", {}), covs, models[metric].preprocess_pipeline, metric
         )
-        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
+        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}), models[metric].scaler)
 
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
         intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
@@ -225,10 +221,10 @@ class BiometricsPredictor:
                 feature_stripped = "_".join(feature.split("_")[:-1])
                 ex_df[feature_stripped] += adjustment
             padded_ex_ts = TimeSeries.from_dataframe(ex_df)
-        pred = model.predict(
+        pred = models[metric].model.predict(
             ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts]
         )
-        unnorm_pred = preprocess_pipeline.inverse_transform(pred)[0]
+        unnorm_pred = models[metric].preprocess_pipeline.inverse_transform(pred)[0]
 
         return [
             {"time": week, "value": value}
@@ -251,9 +247,9 @@ class BiometricsPredictor:
         covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
 
         bm_ts = preprocess_biometric_data(
-            user_data.get("biometric_data", {}), covs, metric
+            user_data.get("biometric_data", {}), covs, models[metric].preprocess_pipeline, metric
         )
-        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}))
+        ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}), models[metric].scaler)
 
         interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
         intersected_bm_ts = bm_ts.slice_intersect(ex_ts)
@@ -262,7 +258,7 @@ class BiometricsPredictor:
 
         horizons = [ceil(WEEKS_PER_MONTH * i) for i in range(1, MAX_MONTH + 1)]
         shap_df = get_shap_values(
-            shap_explainer, intersected_bm_ts, padded_ex_ts, horizons
+            models[metric].shap_explainer, intersected_bm_ts, padded_ex_ts, horizons
         )
         
         shap_dict = shap_df.to_dict()
@@ -286,7 +282,11 @@ class BiometricsPredictor:
         
         #TODO: Should sort based on absolute value instead
         feature_importances.sort(key=lambda x: x[1], reverse=increase_flag)
-        top_features = feature_importances[:3]
+        
+        # Filter out statcov features
+        controllable_features = [x for x in feature_importances if "statcov" not in x[0]]
+    
+        top_features = controllable_features[:3]
         
         names = [x[0] for x in top_features]
         importances = [x[1] for x in top_features]

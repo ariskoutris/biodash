@@ -107,15 +107,16 @@ class RecommendationsResource(Resource):
         """
         try:
             user_data = BiometricsPredictor.get_user_data(user_id)
-            available_metrics = [
-                x["BiometricName"] for x in user_data.get("biometric_data", {})
-            ]
-            if metric not in available_metrics:
-                return {"message": f"{metric} metric unavailable for user"}, 400
-            recommendations = BiometricsPredictor.generate_recommendations(
-                user_id=user_id, target=target, metric=metric, period=period
-            )
         except KeyError:
             return {"message": "Invalid user ID"}, 404
+        
+        available_metrics = [
+            x["BiometricName"] for x in user_data.get("biometric_data", {})
+        ]
+        if metric not in available_metrics:
+            return {"message": f"{metric} metric unavailable for user"}, 400
+        recommendations = BiometricsPredictor.generate_recommendations(
+            user_id=user_id, target=target, metric=metric, period=period
+        )
 
         return recommendations, 200
