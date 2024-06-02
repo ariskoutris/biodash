@@ -5,7 +5,7 @@ var _ = require("lodash");
 const label_to_units = {
   Weight: "kg",
   body_fat_perc: "%",
-  "Muscle Mass": "%",
+  "Muscle Mass": "kg",
   metabolic_age: "years",
   "Fat mass Perc": "%",
   heart_rate_at_rest: "bpm",
@@ -16,7 +16,7 @@ const label_to_target = {
   "Body Fat Perc": "body_fat_perc",
   "Muscle Mass": "Muscle Mass",
   "Metabolic Age": "metabolic_age",
-  "Fat mass Perc": "Fat Mass Perc",
+  "Fat mass Perc": "Fat mass Perc",
   "Resting Heart Rate": "heart_rate_at_rest",
 };
 
