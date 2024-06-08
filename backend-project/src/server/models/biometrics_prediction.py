@@ -158,14 +158,15 @@ class BiometricsPredictor:
         return {x["BiometricName"]: x["Value"][-1] for x in biometric_data}
 
     @staticmethod
-    def predict_all_metrics(user_data, feature_adjustments=None):
+    def predict_all_metrics(user_data, feature_adjustments=None, period=None):
         """
         Predict all metrics for the next MAX_HORIZON weeks.
         """
         biometric_data = user_data.get("biometric_data", {})
         age = user_data.get("age")
         gender = user_data.get("gender")
-        covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})
+        covs = pd.DataFrame(data={"Gender": [gender], "Age": [age]})   
+        week = MAX_HORIZON if period is None else ceil(WEEKS_PER_MONTH * period)
 
         response = {}
         for entry in biometric_data:
@@ -184,7 +185,7 @@ class BiometricsPredictor:
                     ex_df[feature_stripped] += adjustment
                 padded_ex_ts = TimeSeries.from_dataframe(ex_df)
             pred = models[metric].model.predict(
-                MAX_HORIZON, series=[intersected_bm_ts], past_covariates=[padded_ex_ts]
+                week, series=[intersected_bm_ts], past_covariates=[padded_ex_ts]
             )
             unnorm_pred = models[metric].preprocess_pipeline.inverse_transform(pred)[0]
             response[entry["BiometricName"]] = (
@@ -274,6 +275,7 @@ class BiometricsPredictor:
         """
         user_data = BiometricsPredictor.get_user_data(user_id)
         
+        #TODO: Inverse transform feature importances.
         feature_importances_dict = _feature_importances[user_id][metric]
         feature_importances = [(key, feature_importances_dict[key][int(ceil(WEEKS_PER_MONTH * period))]) for key in feature_importances_dict.keys()]
         feature_importances = [(k,v) for k,v in feature_importances if "statcov" not in k]
@@ -296,7 +298,7 @@ class BiometricsPredictor:
                 "1": {
                     "recommendation": names[0],
                     "value": importances[1],
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[0]]),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[0]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[0]]
                     ),
@@ -304,7 +306,7 @@ class BiometricsPredictor:
                 "2": {
                     "recommendation": names[1],
                     "value": importances[1],
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[1]]),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[1]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[1]]
                     ),
@@ -312,7 +314,7 @@ class BiometricsPredictor:
                 "3": {
                     "recommendation": names[2],
                     "value": importances[1],
-                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[2]]),
+                    "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[2]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[2]]
                     ),
