@@ -5,45 +5,45 @@ var _ = require("lodash");
 const label_to_units = {
   Weight: "kg",
   body_fat_perc: "%",
-  muscle_mass_perc: "%",
+  "Muscle Mass": "kg",
   metabolic_age: "years",
-  fat_mass_perc: "%",
+  "Fat mass Perc": "%",
   heart_rate_at_rest: "bpm",
 };
 
 const label_to_target = {
   'Weight': "Weight",
   "Body Fat Perc": "body_fat_perc",
-  "Muscle Mass": "muscle_mass_perc",
+  "Muscle Mass": "Muscle Mass",
   "Metabolic Age": "metabolic_age",
-  "Fat mass Perc": "fat_mass_perc",
+  "Fat mass Perc": "Fat mass Perc",
   "Resting Heart Rate": "heart_rate_at_rest",
 };
 
 const target_to_string = {
   Weight: "Weight",
   body_fat_perc: "Body Fat Percentage",
-  muscle_mass_perc: "Muscle Mass Percentage",
+  "Muscle Mass": "Muscle Mass",
   metabolic_age: "Metabolic Age",
-  fat_mass_perc: "Fat Mass Percentage",
+  "Fat mass Perc": "Fat Mass Percentage",
   heart_rate_at_rest: "Heart Rate at Rest",
 };
 
 const target_to_radar_keys: { [key: string]: string } = {
   Weight: "Weight",
   body_fat_perc: "Body Fat Percentage",
-  muscle_mass_perc: "Muscle Mass",
+  "Muscle Mass": "Muscle Mass",
   metabolic_age: "Metabolic Age",
-  fat_mass_perc: "Fat mass Perc",
+  "Fat mass Perc": "Fat mass Perc",
   heart_rate_at_rest: "Heart Rate at Rest",
 };
 
 const target_to_line_keys: { [key: string]: string } = {
   Weight: "Weight",
   body_fat_perc: "Body Fat Percentage",
-  muscle_mass_perc: "Muscle Mass",
+  "Muscle Mass": "Muscle Mass",
   metabolic_age: "Metabolic Age",
-  fat_mass_perc: "Fat mass Perc",
+  "Fat mass Perc": "Fat mass Perc",
   heart_rate_at_rest: "Heart Rate at Rest",
 };
 
@@ -108,14 +108,14 @@ export const getTargetMinMax = (target: any, data: any) => {
     };
   }
 
-  if (target === "muscle_mass_perc") {
+  if (target === "Muscle Mass") {
     return {
       min: currentValue ? currentValue * 0.6 : 0,
       max: currentValue ? currentValue * 1.1 : 0,
     };
   }
 
-  if (target === "fat_mass_perc" || target === "body_fat_perc") {
+  if (target === "Fat mass Perc" || target === "body_fat_perc") {
     return {
       min: currentValue ? currentValue * 0.7 : 0,
       max: currentValue ? currentValue * 1.3 : 0,

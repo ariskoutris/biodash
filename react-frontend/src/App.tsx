@@ -105,9 +105,9 @@ function App() {
     });
   }, [radar_data, lineData, barData]);
 
-  const getRecommendations = async (goal: number) => {
+  const getRecommendations = async (goal: number, predicted: number) => {
     await postPoints(
-      `recommendations/${userId}/${getLineChartKeys(target)}/${goal}/${period}`
+      `recommendations/${userId}/${getLineChartKeys(target)}/${period}/${goal}/${predicted}`
     )
       .then((data) => {
         console.log("recData", data);
