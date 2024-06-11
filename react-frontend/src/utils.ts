@@ -1,18 +1,35 @@
+import { ChartData, SupportedTarget } from "./types/charts";
 import { Recommendations } from "./types/recommendations";
 
 var _ = require("lodash");
 
+const min_adjustments: { [key: string]: number } = {
+  "Weight": -15,
+  "metabolic_age": -8,
+  "Muscle Mass": 0.6,
+  "Fat mass Perc": 0.7,
+  "body_fat_perc": 0.7,
+};
+
+const max_adjustments: { [key: string]: number } = {
+  "Weight": 15,
+  "metabolic_age": 2,
+  "Muscle Mass": 1.1,
+  "Fat mass Perc": 1.3,
+  "body_fat_perc": 1.3,
+};
+
 const label_to_units = {
-  Weight: "kg",
-  body_fat_perc: "%",
+  "Weight": "kg",
+  "body_fat_perc": "%",
   "Muscle Mass": "kg",
-  metabolic_age: "years",
+  "metabolic_age": "years",
   "Fat mass Perc": "%",
-  heart_rate_at_rest: "bpm",
+  "heart_rate_at_rest": "bpm",
 };
 
 const label_to_target = {
-  'Weight': "Weight",
+  "Weight": "Weight",
   "Body Fat Perc": "body_fat_perc",
   "Muscle Mass": "Muscle Mass",
   "Metabolic Age": "metabolic_age",
@@ -21,30 +38,30 @@ const label_to_target = {
 };
 
 const target_to_string = {
-  Weight: "Weight",
-  body_fat_perc: "Body Fat Percentage",
+  "Weight": "Weight",
+  "body_fat_perc": "Body Fat Percentage",
   "Muscle Mass": "Muscle Mass",
-  metabolic_age: "Metabolic Age",
+  "metabolic_age": "Metabolic Age",
   "Fat mass Perc": "Fat Mass Percentage",
-  heart_rate_at_rest: "Heart Rate at Rest",
+  "heart_rate_at_rest": "Heart Rate at Rest",
 };
 
 const target_to_radar_keys: { [key: string]: string } = {
-  Weight: "Weight",
-  body_fat_perc: "Body Fat Percentage",
+  "Weight": "Weight",
+  "body_fat_perc": "Body Fat Percentage",
   "Muscle Mass": "Muscle Mass",
-  metabolic_age: "Metabolic Age",
+  "metabolic_age": "Metabolic Age",
   "Fat mass Perc": "Fat mass Perc",
-  heart_rate_at_rest: "Heart Rate at Rest",
+  "heart_rate_at_rest": "Heart Rate at Rest",
 };
 
 const target_to_line_keys: { [key: string]: string } = {
-  Weight: "Weight",
-  body_fat_perc: "Body Fat Percentage",
+  "Weight": "Weight",
+  "body_fat_perc": "Body Fat Percentage",
   "Muscle Mass": "Muscle Mass",
-  metabolic_age: "Metabolic Age",
+  "metabolic_age": "Metabolic Age",
   "Fat mass Perc": "Fat mass Perc",
-  heart_rate_at_rest: "Heart Rate at Rest",
+  "heart_rate_at_rest": "Heart Rate at Rest",
 };
 
 export const transformRecData = (data: any): Recommendations => {
@@ -60,21 +77,24 @@ export const transformRecData = (data: any): Recommendations => {
 export const cleanLabel = (label: string) => {
   // Remove 'avg_', '_pastcov', '_statcov' and everything after '_target_'
   let cleaned = label
-    .replace('avg_', '')
-    .replace('_pastcov', '')
-    .replace('_statcov', '')
-    .replace(/_target_.*/, '')
-    .replace(/_/g, ' ');
+    .replace("avg_", "")
+    .replace("_pastcov", "")
+    .replace("_statcov", "")
+    .replace(/_target_.*/, "")
+    .replace(/_/g, " ");
 
-    cleaned = cleaned.replace(/(\bweek\b)/g, 'per $1');
+  cleaned = cleaned.replace(/(\bweek\b)/g, "per $1");
 
   // Convert to title case
-  return cleaned.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+  return cleaned.replace(
+    /\w\S*/g,
+    (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  );
 };
 
 export const getTargetFromLabel = (label: string) => {
   return label_to_target[label as keyof typeof label_to_target];
-}
+};
 
 export const getLineChartKeys = (target: string) => {
   return target_to_line_keys[target];
@@ -105,42 +125,34 @@ export const getProjectedTarget = (target: any, data: any) => {
   return Math.round(predictedValue || 0);
 };
 
-export const getTargetMinMax = (target: any, data: any) => {
-  const currentValue =
-    data?.radar?.current?.[target_to_radar_keys[target]] || null;
+export const getTargetMin = (target: any, data: ChartData) => {
+  const minVal = data.line
+  return getAdjustedTarget(target, data, min_adjustments);
+};
 
-  if (target === "Weight") {
-    return {
-      min: currentValue ? currentValue - 15 : 0,
-      max: currentValue ? currentValue + 15 : 0,
-    };
-  }
+export const getTargetMax = (target: any, data: ChartData) => {
+  return getAdjustedTarget(target, data, max_adjustments);
+};
 
-  if (target === "metabolic_age") {
-    return {
-      min: currentValue ? currentValue - 8 : 0,
-      max: currentValue ? currentValue + 2 : 0,
-    };
-  }
+const getAdjustedTarget = (target: string, data: ChartData, adjustments: any) => {
+  const key = target_to_radar_keys[target];
+  validateTarget(key);
+  const currentValue = data.radar.current[key];
 
-  if (target === "Muscle Mass") {
-    return {
-      min: currentValue ? currentValue * 0.6 : 0,
-      max: currentValue ? currentValue * 1.1 : 0,
-    };
-  }
-
-  if (target === "Fat mass Perc" || target === "body_fat_perc") {
-    return {
-      min: currentValue ? currentValue * 0.7 : 0,
-      max: currentValue ? currentValue * 1.3 : 0,
-    };
-  }
-
-  if (target === "heart_rate_at_rest") {
-    return {
-      min: currentValue ? currentValue - 20 : 0,
-      max: currentValue ? currentValue + 5 : 0,
-    };
+  if (_.includes(["Weight", "metabolic_age", "heart_rate_at_rest"], target)) {
+    return currentValue ? currentValue + adjustments[target] : 0;
+  } else if (
+    _.includes(["Muscle Mass", "Fat mass Perc", "body_fat_perc"], target)
+  ) {
+    return currentValue ? currentValue * adjustments[target] : 0;
+  } else {
+    console.error("Invalid target: ", target);
+    return 0;
   }
 };
+
+function validateTarget(target: any): asserts target is SupportedTarget {
+  if (!_.includes(Object.keys(label_to_target), target)) {
+    throw new Error(`Invalid target: ${target}`);
+  }
+}

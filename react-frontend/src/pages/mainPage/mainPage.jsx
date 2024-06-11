@@ -5,10 +5,11 @@ import ForecastPlot from "../../components/plotContainer/ForecastPlot";
 import HorizontalBarPlot from "../../components/plotContainer/HorizontalBarPlot";
 import { InteractionsContainer } from "../../components/InteractionsContainer";
 import {
-  getTargetMinMax,
   getTargetLabel,
   getTargetUnits,
   getProjectedTarget,
+  getTargetMin,
+  getTargetMax,
 } from "../../utils";
 
 export const MainPage = ({
@@ -46,8 +47,8 @@ export const MainPage = ({
   const forecastPlot = (
     <ForecastPlot
       data={data.line}
-      min={getTargetMinMax(target, data).min}
-      max={getTargetMinMax(target, data).max}
+      min={getTargetMin(target, data)}
+      max={getTargetMax(target, data)}
       units={getTargetUnits(target)}
       metric={target}
       period={period}
@@ -66,8 +67,8 @@ export const MainPage = ({
           data={readyData}
           recData={recData}
           target={target}
-          minTargetValue={getTargetMinMax(target, data).min}
-          maxTargetValue={getTargetMinMax(target, data).max}
+          minTargetValue={getTargetMin(target, data)}
+          maxTargetValue={getTargetMax(target, data)}
           projectedTarget={getProjectedTarget(target, data)}
           onTimePeriodSelected={onTimePeriodSelected}
           onTargetSelected={onTargetSelected}
