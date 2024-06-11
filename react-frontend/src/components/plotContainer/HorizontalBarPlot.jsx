@@ -11,6 +11,8 @@ import { Bar } from "react-chartjs-2";
 import colors from "../../colors.module.scss";
 import { cleanLabel } from "../../utils";
 
+var _ = require("lodash");
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -20,13 +22,25 @@ ChartJS.register(
   Legend
 );
 
-const HorizontalBarPlot = ({ data, period }) => {
-  const labels = Object.keys(data);
-  const cleanedLabels = labels.map(cleanLabel);
+const getSortedData = (labels, vals) => {
+  const combinedData = _.zip(labels, vals);
+  const sortedData = _.sortBy(combinedData, (d) => -Math.abs(d[1]));
+  const sortedLabels = sortedData.map((d) => d[0]);
+  const sortedVals = sortedData.map((d) => d[1]);
 
+  return [sortedLabels, sortedVals];
+}
+
+const HorizontalBarPlot = ({ data, period }) => {
   // Use 4.2 as an approximation for the number of weeks in a month
   const numWeeks = Math.ceil(4.2 * period);
+  
+  const labels = Object.keys(data);
   const importances = labels.map(label => data[label][numWeeks]);
+
+  const cleanedLabels = labels.map(cleanLabel);
+  const [sortedLabels, sortedImportances] = getSortedData(cleanedLabels, importances);
+
   const options = {
     indexAxis: "y",
     elements: {
@@ -43,11 +57,11 @@ const HorizontalBarPlot = ({ data, period }) => {
     },
   };
   const bar_data = {
-    labels: cleanedLabels,
+    labels: sortedLabels,
     datasets: [
       {
         // label: 'Dataset 1',
-        data: importances,
+        data: sortedImportances,
         borderColor: colors.currentPlotColor,
         backgroundColor: colors.currentPlotColorLight,
       },
