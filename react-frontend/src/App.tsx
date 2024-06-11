@@ -3,7 +3,7 @@ import { MainPage } from "./pages/mainPage/mainPage";
 import { useEffect, useState, useMemo } from "react";
 import Button from "react-bootstrap/Button";
 import { postPoints, userLogin } from "./router/resources/data";
-import { getLineChartKeys, transformRecData } from "./utils";
+import { getKeyFromTarget, transformRecData } from "./utils";
 import { Bar, ChartData, Line, LineData, Radar } from "./types/charts";
 import {
   defaultBar,
@@ -71,7 +71,7 @@ function App() {
   useEffect(() => {
     const getBar = async () => {
       const _data = await postPoints(
-        `features/${userId}/${getLineChartKeys(target)}/5`
+        `features/${userId}/${getKeyFromTarget(target)}/5`
       );
       setBarData((_data?.importances as Bar) || defaultBar);
     };
@@ -94,7 +94,7 @@ function App() {
 
   const getRecommendations = async (goal: number, predicted: number) => {
     await postPoints(
-      `recommendations/${userId}/${getLineChartKeys(
+      `recommendations/${userId}/${getKeyFromTarget(
         target
       )}/${period}/${goal}/${predicted}`
     )

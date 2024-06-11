@@ -2,7 +2,7 @@ import "./InteractionsContainer.scss";
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import ToggleButton from "react-bootstrap/ToggleButton";
-import { getTargetFromLabel, getTargetLabel, getTargetUnits, cleanLabel } from "../utils";
+import { getLabelFromTarget, getUnitsFromTarget, cleanLabel, getLabelFromKey, getTargetFromKey } from "../utils";
 var _ = require('lodash');
 
 export const InteractionsContainer = ({
@@ -92,15 +92,10 @@ export const InteractionsContainer = ({
             defaultValue={"Weight"}
           >
             {_.map(data.radar.current, (_, key) => (
-              <option key={key} value={getTargetFromLabel(key)}>
-                {key}
+              <option key={key} value={getTargetFromKey(key)}>
+                {getLabelFromKey(key)}
               </option>
             ))}
-            {/* <option value={"Weight"}>Weight</option>
-            <option value={"metabolic_age"}>Metabolic Age</option>
-            <option value={"muscle_mass_perc"}>Muscle Mass Percentage</option>
-            <option value={"fat_mass_perc"}>Fat Mass Percentage</option>
-            <option value={"heart_rate_at_rest"}>Heart Rate at Rest</option> */}
           </Form.Select>
         </div>
         <div className="boxBodyRow gap">
@@ -114,14 +109,14 @@ export const InteractionsContainer = ({
               tooltip="auto"
             />
             <p>
-              Selected Value: {targetValue} {getTargetUnits(target)}
+              Selected Value: {targetValue} {getUnitsFromTarget(target)}
             </p>
           </div>
         </div>
       </div>
       <div className="boxBodyColumn">
         <div style={{ paddingBottom: "50px" }} className="boxBodyColumn">
-          {`Recommendations for ${getTargetLabel(target)}`}
+          {`Recommendations for ${getLabelFromTarget(target)}`}
           {recommendationButtons()}
         </div>
       </div>

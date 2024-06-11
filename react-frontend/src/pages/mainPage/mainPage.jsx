@@ -5,8 +5,8 @@ import ForecastPlot from "../../components/plotContainer/ForecastPlot";
 import HorizontalBarPlot from "../../components/plotContainer/HorizontalBarPlot";
 import { InteractionsContainer } from "../../components/InteractionsContainer";
 import {
-  getTargetLabel,
-  getTargetUnits,
+  getLabelFromTarget,
+  getUnitsFromTarget,
   getProjectedTarget,
   getTargetMin,
   getTargetMax,
@@ -49,7 +49,7 @@ export const MainPage = ({
       data={data.line}
       min={getTargetMin(target, data)}
       max={getTargetMax(target, data)}
-      units={getTargetUnits(target)}
+      units={getUnitsFromTarget(target)}
       metric={target}
       period={period}
     />
@@ -88,14 +88,14 @@ export const MainPage = ({
           <div className="boxBodyColumn">
             <PlotContainer
               key="ForecastPlot"
-              title={`Forecast for ${getTargetLabel(target)}`}
+              title={`Forecast for ${getLabelFromTarget(target)}`}
               content={forecastPlot}
               height={size}
               width={size}
             />
             <PlotContainer
               key="BarPlot"
-              title={`Feature importance for ${getTargetLabel(target)}`}
+              title={`Feature importance for ${getLabelFromTarget(target)}`}
               content={barPlot}
               height={size}
               width={size}

@@ -19,7 +19,7 @@ const max_adjustments: { [key: string]: number } = {
   "body_fat_perc": 1.3,
 };
 
-const label_to_units = {
+const target_to_units: { [key: string]: string }  = {
   "Weight": "kg",
   "body_fat_perc": "%",
   "Muscle Mass": "kg",
@@ -28,41 +28,20 @@ const label_to_units = {
   "heart_rate_at_rest": "bpm",
 };
 
-const label_to_target = {
-  "Weight": "Weight",
-  "Body Fat Perc": "body_fat_perc",
-  "Muscle Mass": "Muscle Mass",
-  "Metabolic Age": "metabolic_age",
-  "Fat mass Perc": "Fat mass Perc",
-  "Resting Heart Rate": "heart_rate_at_rest",
-};
-
-const target_to_string = {
+const target_to_keys: { [key: string]: string } = {
   "Weight": "Weight",
   "body_fat_perc": "Body Fat Percentage",
   "Muscle Mass": "Muscle Mass",
   "metabolic_age": "Metabolic Age",
+  "Fat mass Perc": "Fat mass Perc",
+  "heart_rate_at_rest": "Heart Rate at Rest",
+};
+
+const keys_to_target = _.invert(target_to_keys);
+
+const target_to_string = _.assign({}, target_to_keys, {
   "Fat mass Perc": "Fat Mass Percentage",
-  "heart_rate_at_rest": "Heart Rate at Rest",
-};
-
-const target_to_radar_keys: { [key: string]: string } = {
-  "Weight": "Weight",
-  "body_fat_perc": "Body Fat Percentage",
-  "Muscle Mass": "Muscle Mass",
-  "metabolic_age": "Metabolic Age",
-  "Fat mass Perc": "Fat mass Perc",
-  "heart_rate_at_rest": "Heart Rate at Rest",
-};
-
-const target_to_line_keys: { [key: string]: string } = {
-  "Weight": "Weight",
-  "body_fat_perc": "Body Fat Percentage",
-  "Muscle Mass": "Muscle Mass",
-  "metabolic_age": "Metabolic Age",
-  "Fat mass Perc": "Fat mass Perc",
-  "heart_rate_at_rest": "Heart Rate at Rest",
-};
+});
 
 export const transformRecData = (data: any): Recommendations => {
   return _.map(data.recommendations, (rec: any) => ({
@@ -92,19 +71,24 @@ export const cleanLabel = (label: string) => {
   );
 };
 
-export const getTargetFromLabel = (label: string) => {
-  return label_to_target[label as keyof typeof label_to_target];
+export const getKeyFromTarget = (target: string) => {
+  return target_to_keys[target];
 };
 
-export const getLineChartKeys = (target: string) => {
-  return target_to_line_keys[target];
+export const getUnitsFromTarget = (target: any) => {
+  return target_to_units[target as keyof typeof target_to_units];
 };
 
-export const getTargetUnits = (target: any) => {
-  return label_to_units[target as keyof typeof label_to_units];
+export const getLabelFromTarget = (target: any) => {
+  return target_to_string[target as keyof typeof target_to_string];
 };
 
-export const getTargetLabel = (target: any) => {
+export const getTargetFromKey = (key: any) => {
+  return keys_to_target[key as keyof typeof keys_to_target];
+}
+
+export const getLabelFromKey = (key: any) => {
+  const target = keys_to_target[key as keyof typeof keys_to_target];
   return target_to_string[target as keyof typeof target_to_string];
 };
 
@@ -112,8 +96,8 @@ export const getRadarLabels = (data: any) => {
   const labels = Object.keys(data.current);
   const labelsWithUnits = labels.map((label) => {
     if (label === "Muscle Mass") return "Muscle Mass Perc (%)";
-    return `${label} (${getTargetUnits(
-      label_to_target[label as keyof typeof label_to_target]
+    return `${label} (${getUnitsFromTarget(
+      keys_to_target[label as keyof typeof keys_to_target]
     )})`;
   });
   return labelsWithUnits;
@@ -121,12 +105,11 @@ export const getRadarLabels = (data: any) => {
 
 export const getProjectedTarget = (target: any, data: any) => {
   const predictedValue =
-    data?.radar?.predicted?.[target_to_radar_keys[target]] || null;
+    data?.radar?.predicted?.[target_to_keys[target]] || null;
   return Math.round(predictedValue || 0);
 };
 
 export const getTargetMin = (target: any, data: ChartData) => {
-  const minVal = data.line
   return getAdjustedTarget(target, data, min_adjustments);
 };
 
@@ -134,8 +117,12 @@ export const getTargetMax = (target: any, data: ChartData) => {
   return getAdjustedTarget(target, data, max_adjustments);
 };
 
-const getAdjustedTarget = (target: string, data: ChartData, adjustments: any) => {
-  const key = target_to_radar_keys[target];
+const getAdjustedTarget = (
+  target: string,
+  data: ChartData,
+  adjustments: any
+) => {
+  const key = target_to_keys[target];
   validateTarget(key);
   const currentValue = data.radar.current[key];
 
@@ -152,7 +139,7 @@ const getAdjustedTarget = (target: string, data: ChartData, adjustments: any) =>
 };
 
 function validateTarget(target: any): asserts target is SupportedTarget {
-  if (!_.includes(Object.keys(label_to_target), target)) {
+  if (!_.includes(Object.keys(keys_to_target), target)) {
     throw new Error(`Invalid target: ${target}`);
   }
 }
