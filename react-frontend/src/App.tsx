@@ -12,6 +12,7 @@ import {
   defaultRadar,
 } from "./defaults";
 import { Recommendation, Recommendations } from "./types/recommendations";
+var _ = require("lodash");
 
 function App() {
   const [data, setData] = useState<ChartData>(defaultChartData);
@@ -22,33 +23,19 @@ function App() {
   const [period, setPeriod] = useState<number>(3); // in months
   const [target, setTarget] = useState<string>("Weight");
 
-  const radar_data = useMemo<Radar>(() => {
-    if(lineData.predicted.Weight?.length === 0) return defaultRadar;
-    const _radar_data : any = {
-      current : Object.entries(lineData.predicted).map(([key, value]) => {
-        return {
-          [key]: value[0].value,
-        };
-      }).reduce((acc, curr) => { 
-        return { ...acc, ...curr }
-      }, {}),
-      predicted: Object.entries(lineData.predicted).map(([key, value]) => {
-        // Use 4.2 as an approximation for the number of weeks in a month
-        return {
-          [key]: value[Math.ceil(4.2 * period) - 1].value,
-        };
-      }).reduce((acc, curr) => { 
-        return { ...acc, ...curr }
-      }, {})
+  const radarData = useMemo<Radar>(() => {
+    if (lineData.predicted.Weight?.length === 0) return defaultRadar;
+    
+    const periodInWeeks = Math.ceil(4.2 * period) - 1
+    const getTargetValue = (data: any, period: any) => {
+      return _.mapValues(data, (value: any) => value[period]?.value);
+    }
+    const _radar_data: any = {
+      current: getTargetValue(lineData.predicted, 0),
+      predicted: getTargetValue(lineData.predicted, periodInWeeks),
     };
-    if(!!lineData.recommended) {
-      _radar_data["recommended"] = Object.entries(lineData.recommended).map(([key, value]) => {
-        return {
-          [key]: value.value,
-        };
-      }).reduce((acc, curr) => { 
-        return { ...acc, ...curr }
-      }, {});
+    if (lineData.recommended) {
+      _radar_data["recommended"] = getTargetValue(lineData.recommended, periodInWeeks)
     }
     return _radar_data;
   }, [lineData, period]);
@@ -99,15 +86,17 @@ function App() {
 
   useEffect(() => {
     setData({
-      radar: radar_data,
+      radar: radarData,
       line: lineData,
       bar: barData,
     });
-  }, [radar_data, lineData, barData]);
+  }, [radarData, lineData, barData]);
 
   const getRecommendations = async (goal: number, predicted: number) => {
     await postPoints(
-      `recommendations/${userId}/${getLineChartKeys(target)}/${period}/${goal}/${predicted}`
+      `recommendations/${userId}/${getLineChartKeys(
+        target
+      )}/${period}/${goal}/${predicted}`
     )
       .then((data) => {
         console.log("recData", data);
@@ -130,7 +119,7 @@ function App() {
       delete newData.radar.recommended;
     }
     setData(newData);
-  }
+  };
 
   return (
     <div className="App">
