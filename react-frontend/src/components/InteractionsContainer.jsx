@@ -2,7 +2,7 @@ import "./InteractionsContainer.scss";
 import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import ToggleButton from "react-bootstrap/ToggleButton";
-import { getTargetFromLabel, getTargetLabel, getTargetUnits } from "../utils";
+import { getTargetFromLabel, getTargetLabel, getTargetUnits, cleanLabel } from "../utils";
 var _ = require('lodash');
 
 export const InteractionsContainer = ({
@@ -62,7 +62,7 @@ export const InteractionsContainer = ({
                 checked={recommendationButtonState[index]}
                 type="checkbox"
               >
-                {value.title}
+                {cleanLabel(value.title)}
               </ToggleButton>
             ))}
           </div>

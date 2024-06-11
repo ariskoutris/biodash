@@ -57,6 +57,21 @@ export const transformRecData = (data: any): Recommendations => {
   }));
 };
 
+export const cleanLabel = (label: string) => {
+  // Remove 'avg_', '_pastcov', '_statcov' and everything after '_target_'
+  let cleaned = label
+    .replace('avg_', '')
+    .replace('_pastcov', '')
+    .replace('_statcov', '')
+    .replace(/_target_.*/, '')
+    .replace(/_/g, ' ');
+
+    cleaned = cleaned.replace(/(\bweek\b)/g, 'per $1');
+
+  // Convert to title case
+  return cleaned.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+};
+
 export const getTargetFromLabel = (label: string) => {
   return label_to_target[label as keyof typeof label_to_target];
 }

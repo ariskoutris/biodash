@@ -9,6 +9,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import colors from "../../colors.module.scss";
+import { cleanLabel } from "../../utils";
 
 ChartJS.register(
   CategoryScale,
@@ -21,6 +22,8 @@ ChartJS.register(
 
 const HorizontalBarPlot = ({ data, period }) => {
   const labels = Object.keys(data);
+  const cleanedLabels = labels.map(cleanLabel);
+
   // Use 4.2 as an approximation for the number of weeks in a month
   const numWeeks = Math.ceil(4.2 * period);
   const importances = labels.map(label => data[label][numWeeks]);
@@ -40,7 +43,7 @@ const HorizontalBarPlot = ({ data, period }) => {
     },
   };
   const bar_data = {
-    labels,
+    labels: cleanedLabels,
     datasets: [
       {
         // label: 'Dataset 1',
