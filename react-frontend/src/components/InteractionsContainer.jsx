@@ -40,8 +40,11 @@ export const InteractionsContainer = ({
   const onTargetValueChanged = async (e) => {
     const goal = Math.round(e.target.value);
     setTargetValue(goal);
+  };
+
+  const onSliderReleased = async () => {
     const predictedValue = Math.round(data.radar.predicted[target]);
-    await getRecommendations(goal, predictedValue);
+    await getRecommendations(targetValue, predictedValue);
   };
 
   const recommendationButtons = () => {
@@ -106,6 +109,7 @@ export const InteractionsContainer = ({
               min={minTargetValue}
               max={maxTargetValue}
               onChange={onTargetValueChanged}
+              onMouseUp={onSliderReleased}
               tooltip="auto"
             />
             <p>
