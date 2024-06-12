@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Form from "react-bootstrap/Form";
 import ToggleButton from "react-bootstrap/ToggleButton";
 import { getLabelFromTarget, getUnitsFromTarget, cleanLabel, getLabelFromKey, getTargetFromKey } from "../utils";
+import { Button } from "react-bootstrap";
 var _ = require('lodash');
 
 export const InteractionsContainer = ({
@@ -75,9 +76,9 @@ export const InteractionsContainer = ({
   };
 
   return (
-    <div className="boxBodyRow">
+    <div className="boxBodyRow spaceChildren">
       <div className="boxBodyColumn">
-        <div className="boxBodyRow gap">
+        <div className="boxBodyRow gap spaceChildren">
           <Form.Select
             size="sm"
             onChange={onTimePeriodSelected}
@@ -101,8 +102,8 @@ export const InteractionsContainer = ({
             ))}
           </Form.Select>
         </div>
-        <div className="boxBodyRow gap">
-          <div className="boxBodyColumn">
+        <div className="boxBodyColumn">
+          <div className="boxBodyRow gap">
             <Form.Range
               className="rangeSlider"
               value={targetValue}
@@ -112,8 +113,19 @@ export const InteractionsContainer = ({
               onMouseUp={onSliderReleased}
               tooltip="auto"
             />
-            <p>
+            <Button
+              style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem' }}
+              onClick={() => onTargetValueChanged({ target: { value: projectedTarget } })}
+            >
+              Reset
+            </Button>
+          </div>
+          <div>
+            <p style={{ marginBottom: 0 }}>
               Selected Value: {targetValue} {getUnitsFromTarget(target)}
+            </p>
+            <p style={{ marginTop: 0 }}>
+              Predicted Value: {projectedTarget} {getUnitsFromTarget(target)}
             </p>
           </div>
         </div>
