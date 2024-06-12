@@ -23,23 +23,22 @@ export const MainPage = ({
   handleRecommendationClick,
 }) => {
   const [readyData, setReadyData] = useState();
+  const [targetSeed, setTargetSeed] = useState(false);
 
   useEffect(() => {
     setReadyData(data);
   }, [data]);
 
-  const onTimePeriodSelected = (e) => {
-    const period = e.target.value;
-    setPeriod(period);
-    // here filter data based on period
-    setReadyData(data);
+  const onTimePeriodSelected = (e, seed) => {
+    const newPeriod = e.target.value;
+    setTargetSeed(seed);
+    setPeriod(newPeriod);
   };
 
   const onTargetSelected = (e) => {
     const target = e.target.value;
+    setTargetSeed(false);
     setTarget(target);
-    // here filter data based on target
-    setReadyData(data);
   };
 
   // if data not ready yet return empty
@@ -67,11 +66,13 @@ export const MainPage = ({
           data={readyData}
           recData={recData}
           target={target}
+          period={period}
           minTargetValue={getTargetMin(target, data)}
           maxTargetValue={getTargetMax(target, data)}
           projectedTarget={getProjectedTarget(target, data)}
-          onTimePeriodSelected={onTimePeriodSelected}
-          onTargetSelected={onTargetSelected}
+          initialTargetValue={targetSeed || getProjectedTarget(target, data)}
+          timePeriodSelectHandler={onTimePeriodSelected}
+          targetSelectHandler={onTargetSelected}
           getRecommendations={getRecommendations}
           handleRecommendationClick={handleRecommendationClick}
         />

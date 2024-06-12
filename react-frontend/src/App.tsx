@@ -93,6 +93,7 @@ function App() {
   }, [radarData, lineData, barData]);
 
   const getRecommendations = async (goal: number, predicted: number) => {
+    setRecData([]);
     await postPoints(
       `recommendations/${userId}/${getKeyFromTarget(
         target
