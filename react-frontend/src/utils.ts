@@ -110,15 +110,29 @@ export const getProjectedTarget = (target: any, data: any) => {
 };
 
 export const getTargetMin = (target: any, data: ChartData) => {
-  return getAdjustedTarget(target, data, min_adjustments);
+  const key = target_to_keys[target];
+  validateTarget(key);
+  const minPredVal = _.min(_.map(data.line.predicted[key], "value"));
+  const minRecVal = _.min(_.map(data.line.recommended?.[key], "value")) || minPredVal;
+  
+  const minBound = getAdjustedTarget(target, data, min_adjustments);
+
+  return Math.min(minPredVal, minRecVal, minBound) || 0
 };
 
 export const getTargetMax = (target: any, data: ChartData) => {
-  return getAdjustedTarget(target, data, max_adjustments);
+  const key = target_to_keys[target];
+  validateTarget(key);
+  const maxPredVal = _.max(_.map(data.line.predicted[key], "value"));
+  const maxRecVal = _.max(_.map(data.line.recommended?.[key], "value")) || maxPredVal;
+  
+  const maxBound = getAdjustedTarget(target, data, max_adjustments);
+
+  return Math.max(maxPredVal, maxRecVal, maxBound) || 0
 };
 
 const getAdjustedTarget = (
-  target: string,
+  target: SupportedTarget,
   data: ChartData,
   adjustments: any
 ) => {
