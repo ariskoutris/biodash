@@ -95,7 +95,6 @@ export const getLabelFromKey = (key: any) => {
 export const getRadarLabels = (data: any) => {
   const labels = Object.keys(data.current);
   const labelsWithUnits = labels.map((label) => {
-    if (label === "Muscle Mass") return "Muscle Mass Perc (%)";
     return `${label} (${getUnitsFromTarget(
       keys_to_target[label as keyof typeof keys_to_target]
     )})`;

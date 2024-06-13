@@ -27,6 +27,15 @@ models["Weight"].load()
 models["Muscle Mass"].load()
 models["Fat mass Perc"].load()
 
+metric_ranges = {
+    "Weight": (40, 100),
+    "Muscle Mass": (20, 100),
+    "Fat mass Perc": (0.1, 100),
+}
+
+def truncate_value(value, range):
+    return max(range[0], min(range[1], value))
+
 WEEKS_PER_MONTH = 4.2
 MAX_MONTH = 5
 MAX_HORIZON = 21
@@ -155,7 +164,7 @@ class BiometricsPredictor:
         Compute current metrics from user data.
         """
         biometric_data = user_data.get("biometric_data", {})
-        return {x["BiometricName"]: x["Value"][-1] for x in biometric_data}
+        return {x["BiometricName"]: truncate_value(x["Value"][-1], metric_ranges[x['BiometricName']]) for x in biometric_data}
 
     @staticmethod
     def predict_all_metrics(user_data, feature_adjustments=None, period=None):
@@ -189,7 +198,7 @@ class BiometricsPredictor:
             )
             unnorm_pred = models[metric].preprocess_pipeline.inverse_transform(pred)[0]
             response[entry["BiometricName"]] = (
-                unnorm_pred.values().flatten().tolist()[-1]
+                truncate_value(unnorm_pred.values().flatten().tolist()[-1], metric_ranges[entry['BiometricName']])
             )
 
         return response
@@ -225,9 +234,8 @@ class BiometricsPredictor:
             ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts]
         )
         unnorm_pred = models[metric].preprocess_pipeline.inverse_transform(pred)[0]
-
         return [
-            {"time": week, "value": value}
+            {"time": week, "value": truncate_value(value, metric_ranges[metric])}
             for week, value in zip(
                 range(ceil(WEEKS_PER_MONTH * period)),
                 unnorm_pred.values().flatten().tolist(),
@@ -288,6 +296,7 @@ class BiometricsPredictor:
         
         names = [x[0] for x in top_features]
         importances = [x[1] for x in top_features]
+        print('generate_recommendations - importances', importances)
 
         scaling_factor = abs(target - predicted) / abs(target + predicted)
         feature_adjustments = [(x[0], scaling_factor * 100) for x in top_features]
