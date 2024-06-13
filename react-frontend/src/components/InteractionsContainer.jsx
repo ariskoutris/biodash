@@ -165,10 +165,10 @@ export const InteractionsContainer = ({
           </div>
           <div>
             <p style={{ marginBottom: 0 }}>
-              Selected Value: {targetValue} {getUnitsFromTarget(target)}
+              Target Value: {targetValue} {getUnitsFromTarget(target)}
             </p>
             <p style={{ marginTop: 0 }}>
-              Predicted Value: {projectedTarget} {getUnitsFromTarget(target)}
+              Current Prediction: {projectedTarget} {getUnitsFromTarget(target)}
             </p>
           </div>
         </div>
