@@ -10,6 +10,7 @@ import {
 import { Radar } from "react-chartjs-2";
 import colors from "../../colors.module.scss";
 import { getRadarLabels } from "../../utils";
+var _ = require("lodash");
 
 ChartJS.register(
   RadialLinearScale,
@@ -21,27 +22,20 @@ ChartJS.register(
 );
 
 const RadarChart = ({ data }) => {
+  if (!data) return <></>;
+
   const labels = getRadarLabels(data);
-  const currentValues = Object.values(data.current);
-  const predictedValues = Object.values(data.predicted);
   const radarData = {
     labels,
-    datasets: [
-      {
-        label: "Current",
-        data: currentValues,
-        backgroundColor: colors.currentPlotColorLight,
-        borderColor: colors.currentPlotColor,
+    datasets: _.map(data, (values, key) => {
+      return {
+        label: _.capitalize(key),
+        data: Object.values(values),
+        backgroundColor: colors[key + "PlotColorLight"],
+        borderColor: colors[key + "PlotColor"],
         borderWidth: 1,
-      },
-      {
-        label: "Predicted",
-        data: predictedValues,
-        backgroundColor: colors.predictedPlotColorLight,
-        borderColor: colors.predictedPlotColor,
-        borderWidth: 1,
-      },
-    ],
+      };
+    }),
   };
   const options = {
     scales: {

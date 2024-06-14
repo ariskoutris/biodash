@@ -1,6 +1,6 @@
 @import "../custom-bootstrap.scss";
 
-.boxBodyRow > * {
+.spaceChildren > * {
   margin: 0% 4% 0% 4%;
 }
 
@@ -15,5 +15,5 @@
 
 .recBtn {
   @extend .btn;
-  font-size: small
+  font-size: 0.75em; 
 }
