@@ -28,6 +28,7 @@ metric_ranges = {
     "Weight": (40, 100),
     "Muscle Mass": (20, 100),
     "Fat mass Perc": (0.1, 100),
+    "HR At Rest": (30,110)
 }
 SUPPORTED_METRICS = list(metric_ranges.keys())
 
@@ -134,7 +135,7 @@ def get_shap_values(shap_explainer, target, past_cov, horizons):
     return importances_df
 
 
-def preprocess_exercise_data(exercise_data, scaler, use_muscle_groups=False):
+def preprocess_exercise_data(exercise_data, scaler, use_muscle_groups=False, use_scaler=True):
     
     exercise_types = [x for x in exercise_data.keys() if x != "week"]
     weeks = pd.Index(exercise_data["week"])
@@ -153,7 +154,10 @@ def preprocess_exercise_data(exercise_data, scaler, use_muscle_groups=False):
             ex_ts = ts
         else:
             ex_ts = ex_ts.stack(ts)
-    return scaler.transform(ex_ts)
+            
+    if use_scaler:
+        return scaler.transform(ex_ts)
+    return ex_ts
 
 
 def preprocess_biometric_data(biometric_data, covs, preprocessor, metric=None):
@@ -269,6 +273,7 @@ class BiometricsPredictor:
             ceil(WEEKS_PER_MONTH * period), [intersected_bm_ts], [padded_ex_ts]
         )
         unnorm_pred = models[metric].preprocess_pipeline.inverse_transform(pred)[0]
+
         return [
             {"time": week, "value": truncate_value(value, metric_ranges[metric])}
             for week, value in zip(
@@ -329,10 +334,9 @@ class BiometricsPredictor:
         top_features = feature_importances[:3]
         names = [x[0] for x in top_features]
         scaling_factor = abs(target - predicted) / ((abs(target + predicted)*2))
-        print('scaling factor', scaling_factor)
-        print('feature adjustments', [(feat,  (agg_training_data[strip_exercise_name(feat)][-1] + exercise_feature_means[strip_exercise_name(feat)])/2) for feat, _ in top_features])
-        
-        feature_adjustments = [(feat, scaling_factor * (agg_training_data[strip_exercise_name(feat)][-1] + exercise_feature_means[strip_exercise_name(feat)])/2) for feat, _ in top_features]
+
+        feature_adjustments = [(feat, scaling_factor * 20*max(np.log(exercise_feature_means[strip_exercise_name(feat)]),0)) for feat, _ in top_features]
+
         return {
             "user_id": user_id,
             "recommendations": {

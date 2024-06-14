@@ -9,7 +9,7 @@ import os
 
 dirname = os.path.dirname(__file__)
 
-METRICS = ['Weight', 'Muscle Mass', 'Fat mass Perc']
+METRICS = ['Weight', 'Muscle Mass', 'Fat mass Perc', 'HR At Rest']
 
 class PredictionsResource(Resource):
     """
