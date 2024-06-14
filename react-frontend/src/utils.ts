@@ -46,6 +46,7 @@ const target_to_string = _.assign({}, target_to_keys, {
 export const transformRecData = (data: any): Recommendations => {
   return _.map(data.recommendations, (rec: any) => ({
     title: rec.recommendation,
+    scale: rec.value,
     new_metrics: rec.new_metrics,
     new_ts: {
       [data.metric]: rec.new_ts,

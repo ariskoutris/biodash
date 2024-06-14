@@ -9,6 +9,7 @@ import os
 
 dirname = os.path.dirname(__file__)
 
+METRICS = ['Weight', 'Muscle Mass', 'Fat mass Perc']
 
 class PredictionsResource(Resource):
     """
@@ -53,10 +54,8 @@ class LineChartResource(Resource):
         ]
         line_chart_data = {"user_id": user_id, "period": period, "metrics": {}}
         for metric in available_metrics:
-            if metric not in available_metrics:
-                return {
-                    "message": f"{metric} metric unavailable for user_id: {user_id}"
-                }, 400
+            if metric not in METRICS:
+                continue
             line_chart_data["metrics"][metric] = (
                 BiometricsPredictor.predict_metric_over_time(user_data, metric, period)
             )
@@ -79,6 +78,8 @@ class FeatureImportanceResource(Resource):
         ]
         if metric not in available_metrics:
             return {"message": f"{metric} metric unavailable for user"}, 400
+        if metric not in METRICS:
+            return {"message": f"{metric} metric not supported"}, 400
 
         importances = BiometricsPredictor.calculate_feature_importances(
             user_id=user_id, metric=metric
@@ -117,6 +118,9 @@ class RecommendationsResource(Resource):
         ]
         if metric not in available_metrics:
             return {"message": f"{metric} metric unavailable for user"}, 400
+        if metric not in METRICS:
+            return {"message": f"{metric} metric not supported"}, 400
+        
         recommendations = BiometricsPredictor.generate_recommendations(
             user_id=user_id, target=target, metric=metric, period=period, predicted=predicted
         )

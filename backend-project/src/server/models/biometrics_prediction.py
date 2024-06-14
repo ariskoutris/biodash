@@ -8,9 +8,13 @@ from darts.timeseries import TimeSeries
 from darts.utils.missing_values import fill_missing_values as darts_fill_na
 
 from .model import ModelLoader
-import warnings
 
+import warnings
 warnings.filterwarnings("ignore", message=".*X has feature names, but.*")
+
+WEEKS_PER_MONTH = 4.2
+MAX_MONTH = 5
+MAX_HORIZON = 21
 
 _data_store = {}
 _feature_importances = {}
@@ -20,28 +24,53 @@ file_dir = os.path.dirname(__file__)
 par_dir = os.path.abspath(os.path.join(file_dir, os.pardir))
 weights_dir = os.path.join(par_dir, "weights")
 
-models["Weight"] = ModelLoader(weights_dir, "Weight")
-models["Muscle Mass"] = ModelLoader(weights_dir, "Muscle Mass")
-models["Fat mass Perc"] = ModelLoader(weights_dir, "Fat mass Perc")
-models["Weight"].load()
-models["Muscle Mass"].load()
-models["Fat mass Perc"].load()
-
 metric_ranges = {
     "Weight": (40, 100),
     "Muscle Mass": (20, 100),
     "Fat mass Perc": (0.1, 100),
 }
+SUPPORTED_METRICS = list(metric_ranges.keys())
+
+for metric in SUPPORTED_METRICS:
+    models[metric] = ModelLoader(weights_dir, metric)
+    models[metric].load()
+    
+print("Models loaded")
+
+exercise_feature_means = {
+    "total_calories_week": 750.853791,
+    "total_minutes_week": 6733.932146,
+    "cardio_calories_week": 456.336665,
+    "cardio_minutes_week": 3454.054092,
+    "isotonic_calories_week": 294.517126,
+    "isotonic_minutes_week": 3279.878054,
+    "upper_body_calories_week": 118.636945,
+    "upper_body_minutes_week": 1532.894512,
+    "lower_body_calories_week": 306.058189,
+    "lower_body_minutes_week": 2694.251284,
+    "core_calories_week": 59.269701,
+    "core_minutes_week": 657.902084,
+    "total_body_calories_week": 266.888956,
+    "total_body_minutes_week": 1848.884266,
+    "avg_duration_per_workout": 2749.983431,
+    "avg_calories_per_workout": 306.448705,
+    "avg_metsmin_workout": 46.559883,
+    "avg_isotonic_workouts": 13.240998,
+    "avg_cardio_workouts": 3.862677,
+    "avg_upper_body_workouts": 5.920390,
+    "avg_lower_body_workouts": 6.475749,
+    "avg_core_workouts_week": 2.581354,
+    "avg_total_body_workouts": 2.126183
+}
+
+MUSCLE_FEATURES = ['upper_body_calories_week', 'upper_body_minutes_week', 'lower_body_calories_week', 'lower_body_minutes_week', 'core_calories_week', 'core_minutes_week', 'total_body_calories_week', 'total_body_minutes_week', 'avg_upper_body_workouts', 'avg_lower_body_workouts', 'avg_core_workouts_week', 'avg_total_body_workouts']
+
+
+def strip_exercise_name(exercise_name):
+    return "_".join(exercise_name.split("_")[:-1])
 
 def truncate_value(value, range):
     return max(range[0], min(range[1], value))
-
-WEEKS_PER_MONTH = 4.2
-MAX_MONTH = 5
-MAX_HORIZON = 21
-
-print("Model loaded")
-
 
 def pad_timeseries(ts, pad_length, feature_adjustments=None):
     pad_ts = ts.last_values()
@@ -105,12 +134,16 @@ def get_shap_values(shap_explainer, target, past_cov, horizons):
     return importances_df
 
 
-def preprocess_exercise_data(exercise_data, scaler):
+def preprocess_exercise_data(exercise_data, scaler, use_muscle_groups=False):
+    
     exercise_types = [x for x in exercise_data.keys() if x != "week"]
     weeks = pd.Index(exercise_data["week"])
 
     ex_ts = None
     for col in exercise_types:
+        if not use_muscle_groups:
+            if col in MUSCLE_FEATURES:
+                continue
         values = exercise_data[col]
         ts = TimeSeries.from_times_and_values(
             times=weeks, values=values, columns=[col], freq=1
@@ -180,7 +213,9 @@ class BiometricsPredictor:
         response = {}
         for entry in biometric_data:
             metric = entry["BiometricName"]
-            
+            if metric not in SUPPORTED_METRICS:
+                continue
+           
             ex_ts = preprocess_exercise_data(user_data.get("agg_training_data", {}), models[metric].scaler)
             bm_ts = preprocess_biometric_data(entry, covs, models[metric].preprocess_pipeline)
             interesected_ex_ts = ex_ts.slice_intersect(bm_ts)
@@ -282,31 +317,28 @@ class BiometricsPredictor:
         Calculate feature importances for the specified metric, desired target and period.
         """
         user_data = BiometricsPredictor.get_user_data(user_id)
+        agg_training_data = user_data.get("agg_training_data", {})
         
-        #TODO: Inverse transform feature importances.
         feature_importances_dict = _feature_importances[user_id][metric]
         feature_importances = [(key, feature_importances_dict[key][int(ceil(WEEKS_PER_MONTH * period))]) for key in feature_importances_dict.keys()]
         feature_importances = [(k,v) for k,v in feature_importances if "statcov" not in k]
-        
         increase_flag = target > predicted
         
         feature_importances.sort(key=lambda x: x[1], reverse=increase_flag)
-    
-        top_features = feature_importances[:3]
         
+        top_features = feature_importances[:3]
         names = [x[0] for x in top_features]
-        importances = [x[1] for x in top_features]
-        print('generate_recommendations - importances', importances)
-
-        scaling_factor = abs(target - predicted) / abs(target + predicted)
-        feature_adjustments = [(x[0], scaling_factor * 100) for x in top_features]
-
+        scaling_factor = abs(target - predicted) / ((abs(target + predicted)*2))
+        print('scaling factor', scaling_factor)
+        print('feature adjustments', [(feat,  (agg_training_data[strip_exercise_name(feat)][-1] + exercise_feature_means[strip_exercise_name(feat)])/2) for feat, _ in top_features])
+        
+        feature_adjustments = [(feat, scaling_factor * (agg_training_data[strip_exercise_name(feat)][-1] + exercise_feature_means[strip_exercise_name(feat)])/2) for feat, _ in top_features]
         return {
             "user_id": user_id,
             "recommendations": {
                 "1": {
                     "recommendation": names[0],
-                    "value": importances[1],
+                    "value": feature_adjustments[0][1],
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[0]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[0]]
@@ -314,7 +346,7 @@ class BiometricsPredictor:
                 },
                 "2": {
                     "recommendation": names[1],
-                    "value": importances[1],
+                    "value": feature_adjustments[1][1],
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[1]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[1]]
@@ -322,7 +354,7 @@ class BiometricsPredictor:
                 },
                 "3": {
                     "recommendation": names[2],
-                    "value": importances[1],
+                    "value": feature_adjustments[2][1],
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[2]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[2]]

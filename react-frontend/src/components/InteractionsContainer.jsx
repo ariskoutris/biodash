@@ -110,7 +110,7 @@ export const InteractionsContainer = ({
                 checked={recommendationButtonState[index]}
                 type="checkbox"
               >
-                {cleanLabel(value.title)}
+                {cleanLabel(value.title)} <br></br> {value.scale}
               </ToggleButton>
             ))}
           </div>
