@@ -12,7 +12,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.2"
-matplotlib = "^3.8.4"
 scikit-learn = "^1.4.2"
 flask = "^3.0.3"
 flask-restful = "^0.3.10"
@@ -20,6 +19,7 @@ flask-cors = "^4.0.0"
 flake8 = "^7.0.0"
 marshmallow = "^3.21.1"
 joblib = "^1.4.0"
+u8darts = "^0.29.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "24.3.0"

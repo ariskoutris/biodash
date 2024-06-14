@@ -13,17 +13,10 @@ def add_routes(app):
         res.forecast_data.PredictionsResource, API + "import", methods=["POST"]
     )
 
-    # Resource for getting radar chart data using a user ID and period
-    api.add_resource(
-        res.forecast_data.RadarChartResource,
-        API + "radar/<string:user_id>/<int:period>",
-        methods=["GET"],
-    )
-
     # Resource for getting line chart data using a user ID, metric, and period
     api.add_resource(
         res.forecast_data.LineChartResource,
-        API + "line/<string:user_id>/<string:metric>/<int:period>",
+        API + "line/<string:user_id>/<int:period>",
         methods=["GET"],
     )
 
@@ -31,5 +24,12 @@ def add_routes(app):
     api.add_resource(
         res.forecast_data.FeatureImportanceResource,
         API + "features/<string:user_id>/<string:metric>/<int:period>",
+        methods=["GET"],
+    )
+    
+    # Resource for getting recommendations using a user ID, metric, target, and period
+    api.add_resource(
+        res.forecast_data.RecommendationsResource,
+        API + "recommendations/<string:user_id>/<string:metric>/<int:period>/<int:target>/<int:predicted>",
         methods=["GET"],
     )
