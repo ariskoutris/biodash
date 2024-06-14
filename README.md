@@ -27,7 +27,7 @@ The project aims to design an interactive system that adapts to each athlete's u
 Once an athlete logs into the platform, they're greeted with a dashboard displaying their performance history, biometrics, and the evolution of their body characteristics. It highlights the influence of specific training habits and lifestyle factors on their health or recovery, pinpointing areas for potential improvement. The platform allows for real-time adjustments to these factors, showing immediate projected impacts on performance and well-being. 
 
 ### Users
-The target users of our project are athletes, from beginners to intermediate levels, who are looking to improve specific aspects of their performance. The platform is designed to be user-friendly and accessible to all, regardless of their technical background.
+The target users of our project are athletes as well as people who work out casually, who are looking to improve specific aspects of their performance. The platform is designed to be user-friendly and accessible to all, regardless of their technical background.
 
 ### Datasets
 The dataset used in this project is provided by our partners at TechnoGym. The data is anonymized and includes information on training habits and various biometrics collected by smartwatches and special equipment. The raw data are stored in excel files, from which we extract the information our model needs and collect everything in a .csv file, which can be found in the folder [data](backend-project/data).
@@ -234,8 +234,8 @@ Milestones can be found in detail in our [project board](https://gitlab.inf.ethz
 ## Contribution Statement
 Members contribution:
 - Ahmad Khan: Worked on the frontend part of the project, including the hooks, dashboard interactivity and plot styling.
-- Aristotelis Koutris: Handled the machine learning model training, predictions, feature importance and recommendations.
-- Maria Gkoulta: Worked on the data preprocessing and feature extraction, front-end styling and design.
+- Aristotelis Koutris: Handled the machine learning model training, predictions, feature importance and recommendations. Also integrated those components on the frontend and worked on front-end styling.
+- Maria Gkoulta: Worked on the data preprocessing and feature extraction, front-end styling and design. Also worked on composing the report and making the poster.
 - George Manos: Handled project build, deployment and front-end dashboard structure. Also worked on front-end structure, plots and model integration to the frontend.
 
 Also note that all members contributed to the front-end design options to improve the application's story-telling.
