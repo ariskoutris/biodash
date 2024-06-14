@@ -104,13 +104,14 @@ export const InteractionsContainer = ({
             {_.map(recData, (value, index) => (
               <ToggleButton
                 className="recBtn"
-                style={{ maxWidth: "150px", height: "70px" }}
+                style={{ maxWidth: "150px", height: "70px", display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
                 key={value.title}
                 onClick={() => onRecommendationClicked(value, index)}
                 checked={recommendationButtonState[index]}
                 type="checkbox"
               >
-                {cleanLabel(value.title)}
+                <span style={{ flexGrow: 1 }}>{cleanLabel(value.title)}</span>
+                <span>{value.scale.toFixed(2)}</span>
               </ToggleButton>
             ))}
           </div>
@@ -165,10 +166,10 @@ export const InteractionsContainer = ({
           </div>
           <div>
             <p style={{ marginBottom: 0 }}>
-              Selected Value: {targetValue} {getUnitsFromTarget(target)}
+              Target Value: {targetValue} {getUnitsFromTarget(target)}
             </p>
             <p style={{ marginTop: 0 }}>
-              Predicted Value: {projectedTarget} {getUnitsFromTarget(target)}
+              Current Prediction: {projectedTarget} {getUnitsFromTarget(target)}
             </p>
           </div>
         </div>

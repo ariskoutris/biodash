@@ -2,11 +2,10 @@ import { RadarData } from "./types/charts";
 
 const defaultRadarData : RadarData = {
   "Weight": 0,
-  "Body Fat Perc": 0,
   "Muscle Mass": 0,
   "Metabolic Age": 0,
   "Fat mass Perc": 0,
-  "Resting Heart Rate": 0,
+  "HR At Rest": 0,
 };
 
 const defaultRadar = {
@@ -16,11 +15,10 @@ const defaultRadar = {
 
 const defaultLineData = {
   "Weight": [],
-  "Body Fat Perc": [],
   "Muscle Mass": [],
   "Metabolic Age": [],
   "Fat mass Perc": [],
-  "Resting Heart Rate": [],
+  "HR At Rest": [],
 };
 
 const defaultLine = {
