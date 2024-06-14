@@ -7,7 +7,7 @@ const min_adjustments: { [key: string]: number } = {
   "Weight": -7,
   "Metabolic Age": -4,
   "Muscle Mass": 0.85,
-  "Fat mass Perc": 0.85,
+  "Fat mass Perc": 0.9,
   "HR At Rest": 0.85,
 };
 
@@ -15,7 +15,7 @@ const max_adjustments: { [key: string]: number } = {
   "Weight": 7,
   "Metabolic Age": 4,
   "Muscle Mass": 1.2,
-  "Fat mass Perc": 1.2,
+  "Fat mass Perc": 1.1,
   "HR At Rest": 1.2,
 };
 
