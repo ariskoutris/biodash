@@ -233,7 +233,7 @@ Milestones can be found in detail in our [project board](https://gitlab.inf.ethz
 
 ## Contribution Statement
 Members contribution:
-- Ahmad Khan: Worked on the frontend part of the project, including the hookups, dashboard interactivity and plot styling.
+- Ahmad Khan: Worked on the frontend part of the project, including the hooks, dashboard interactivity and plot styling.
 - Aristotelis Koutris: Handled the machine learning model training, predictions, feature importance and recommendations.
 - Maria Gkoulta: Worked on the data preprocessing and feature extraction, front-end styling and design.
 - George Manos: Handled project build, deployment and front-end dashboard structure. Also worked on front-end structure, plots and model integration to the frontend.
