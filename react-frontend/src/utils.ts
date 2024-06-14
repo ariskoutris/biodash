@@ -4,37 +4,35 @@ import { Recommendations } from "./types/recommendations";
 var _ = require("lodash");
 
 const min_adjustments: { [key: string]: number } = {
-  "Weight": -15,
-  "metabolic_age": -8,
-  "Muscle Mass": 0.6,
-  "Fat mass Perc": 0.7,
-  "body_fat_perc": 0.7,
+  "Weight": -7,
+  "Metabolic Age": -4,
+  "Muscle Mass": 0.85,
+  "Fat mass Perc": 0.85,
+  "HR At Rest": 0.85,
 };
 
 const max_adjustments: { [key: string]: number } = {
-  "Weight": 15,
-  "metabolic_age": 2,
-  "Muscle Mass": 1.1,
-  "Fat mass Perc": 1.3,
-  "body_fat_perc": 1.3,
+  "Weight": 7,
+  "Metabolic Age": 4,
+  "Muscle Mass": 1.2,
+  "Fat mass Perc": 1.2,
+  "HR At Rest": 1.2,
 };
 
 const target_to_units: { [key: string]: string }  = {
   "Weight": "kg",
-  "body_fat_perc": "%",
   "Muscle Mass": "kg",
-  "metabolic_age": "years",
+  "Metabolic Age": "years",
   "Fat mass Perc": "%",
-  "heart_rate_at_rest": "bpm",
+  "HR At Rest": "bpm",
 };
 
 const target_to_keys: { [key: string]: string } = {
   "Weight": "Weight",
-  "body_fat_perc": "Body Fat Percentage",
   "Muscle Mass": "Muscle Mass",
-  "metabolic_age": "Metabolic Age",
+  "Metabolic Age": "Metabolic Age",
   "Fat mass Perc": "Fat mass Perc",
-  "heart_rate_at_rest": "Heart Rate at Rest",
+  "HR At Rest": "HR At Rest",
 };
 
 const keys_to_target = _.invert(target_to_keys);
@@ -140,10 +138,10 @@ const getAdjustedTarget = (
   validateTarget(key);
   const currentValue = data.radar.current[key];
 
-  if (_.includes(["Weight", "metabolic_age", "heart_rate_at_rest"], target)) {
+  if (_.includes(["Weight", "Metabolic Age", "HR At Rest"], target)) {
     return currentValue ? currentValue + adjustments[target] : 0;
   } else if (
-    _.includes(["Muscle Mass", "Fat mass Perc", "body_fat_perc"], target)
+    _.includes(["Muscle Mass", "Fat mass Perc"], target)
   ) {
     return currentValue ? currentValue * adjustments[target] : 0;
   } else {

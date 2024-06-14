@@ -104,13 +104,14 @@ export const InteractionsContainer = ({
             {_.map(recData, (value, index) => (
               <ToggleButton
                 className="recBtn"
-                style={{ maxWidth: "150px", height: "70px" }}
+                style={{ maxWidth: "150px", height: "70px", display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
                 key={value.title}
                 onClick={() => onRecommendationClicked(value, index)}
                 checked={recommendationButtonState[index]}
                 type="checkbox"
               >
-                {cleanLabel(value.title)} <br></br> {value.scale}
+                <span style={{ flexGrow: 1 }}>{cleanLabel(value.title)}</span>
+                <span>{value.scale.toFixed(2)}</span>
               </ToggleButton>
             ))}
           </div>

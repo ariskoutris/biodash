@@ -1,10 +1,9 @@
 export interface RadarData {
   "Weight"?: number;
-  "Body Fat Perc"?: number;
   "Muscle Mass"?: number;
   "Metabolic Age"?: number;
   "Fat mass Perc"?: number;
-  "Resting Heart Rate"?: number;
+  "HR At Rest"?: number;
 }
 
 export type SupportedTarget = keyof RadarData;
@@ -21,11 +20,10 @@ export interface TSPoint {
 }
 export interface LineData {
   "Weight"?: TSPoint[],
-  "Body Fat Perc"?: TSPoint [],
   "Muscle Mass"?: TSPoint[],
   "Metabolic Age"?: TSPoint [],
   "Fat mass Perc"?: TSPoint [],
-  "Resting Heart Rate"?: TSPoint[],
+  "HR At Rest"?: TSPoint[],
 }
 
 export interface Line {
