@@ -10,7 +10,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import colors from "../../colors.module.scss";
-import { getLineChartKeys } from "../../utils";
+import { getKeyFromTarget } from "../../utils";
 var _ = require("lodash");
 
 ChartJS.register(
@@ -28,7 +28,7 @@ const ForecastPlot = ({ data, min, max, units, metric, period }) => {
   const numWeeks = Math.ceil(4.2 * period) - 1;
   const lineData = _.mapValues(data, (val) =>
     _.filter(
-      val[getLineChartKeys(metric)] || [],
+      val[getKeyFromTarget(metric)] || [],
       (item) => item.time <= numWeeks
     )
   );

@@ -7,6 +7,8 @@ export interface RadarData {
   "Resting Heart Rate"?: number;
 }
 
+export type SupportedTarget = keyof RadarData;
+
 export interface Radar {
   current: RadarData;
   predicted: RadarData;
