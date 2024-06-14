@@ -14,22 +14,20 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         curl \
-        build-essential \
-        cmake \
-        gcc \
         g++ \
         git \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && apt-get remove -y curl \
     && apt-get -y autoremove \
     && apt-get clean \
+    && pip install --upgrade pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory in the container
 WORKDIR /srv/backend-app
 
 # Copy only pyproject.toml and poetry.lock (if available) to cache dependencies
-COPY README.md pyproject.toml poetry.lock* /srv/backend-app/
+COPY README.md pyproject.toml /srv/backend-app/
 
 # Disable creation of a virtual environment as the container itself is isolated
 RUN poetry config virtualenvs.create false
@@ -39,7 +37,6 @@ COPY . /srv/backend-app
 
 # Install runtime dependencies using Poetry
 RUN poetry install --only main --no-cache
-
 
 # Command to run your application
 CMD ["python", "-m", "src.server.router.app", "--host", "0.0.0.0"]

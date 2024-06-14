@@ -38,6 +38,7 @@ build_backend:
       --context "${CI_PROJECT_DIR}/backend-project"
       --dockerfile "${CI_PROJECT_DIR}/backend-project/Dockerfile"
       --destination "${IMAGE_NAME}-backend:${CI_COMMIT_REF_NAME}"
+      --compressed-caching=false
 
 build_frontend:
   stage: build
