@@ -40,20 +40,20 @@ print("Models loaded")
 
 exercise_feature_means = {
     "total_calories_week": 750.853791,
-    "total_minutes_week": 6733.932146,
+    "total_minutes_week": 6733.932146/60,
     "cardio_calories_week": 456.336665,
-    "cardio_minutes_week": 3454.054092,
+    "cardio_minutes_week": 3454.054092/60,
     "isotonic_calories_week": 294.517126,
-    "isotonic_minutes_week": 3279.878054,
+    "isotonic_minutes_week": 3279.878054/60,
     "upper_body_calories_week": 118.636945,
-    "upper_body_minutes_week": 1532.894512,
+    "upper_body_minutes_week": 1532.894512/60,
     "lower_body_calories_week": 306.058189,
-    "lower_body_minutes_week": 2694.251284,
+    "lower_body_minutes_week": 2694.251284/60,
     "core_calories_week": 59.269701,
-    "core_minutes_week": 657.902084,
+    "core_minutes_week": 657.902084/60,
     "total_body_calories_week": 266.888956,
-    "total_body_minutes_week": 1848.884266,
-    "avg_duration_per_workout": 2749.983431,
+    "total_body_minutes_week": 1848.884266/60,
+    "avg_duration_per_workout": 2749.983431/60,
     "avg_calories_per_workout": 306.448705,
     "avg_metsmin_workout": 46.559883,
     "avg_isotonic_workouts": 13.240998,
@@ -342,7 +342,7 @@ class BiometricsPredictor:
             "recommendations": {
                 "1": {
                     "recommendation": names[0],
-                    "value": feature_adjustments[0][1],
+                    "value": feature_adjustments[0][1] * exercise_feature_means[strip_exercise_name(names[0])],
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[0]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[0]]
@@ -350,7 +350,7 @@ class BiometricsPredictor:
                 },
                 "2": {
                     "recommendation": names[1],
-                    "value": feature_adjustments[1][1],
+                    "value": feature_adjustments[1][1] * exercise_feature_means[strip_exercise_name(names[1])],
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[1]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[1]]
@@ -358,7 +358,7 @@ class BiometricsPredictor:
                 },
                 "3": {
                     "recommendation": names[2],
-                    "value": feature_adjustments[2][1],
+                    "value": feature_adjustments[2][1] * exercise_feature_means[strip_exercise_name(names[2])],
                     "new_metrics": BiometricsPredictor.predict_all_metrics(user_data, [feature_adjustments[2]], period=period),
                     "new_ts": BiometricsPredictor.predict_metric_over_time(
                         user_data, metric, period, [feature_adjustments[2]]
