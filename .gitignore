@@ -1,3 +1,7 @@
+# Data files
+*.csv
+*.xlsx
+
 node_modules
 .azure
 .vscode
