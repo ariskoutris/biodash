@@ -1,15 +1,7 @@
 <div align="center">
     <h1>🏃‍♂️ BioDash 🏋️‍♀️</h1>
     <p>
-        <a href="#">
-            <img src="https://img.shields.io/badge/Python-3.10-306998" alt="Python 3.10">
-        </a>
-        <a href="#">
-            <img src="https://img.shields.io/badge/Conda-4.12.0-44903d" alt="Conda 4.12.0">
-        </a>
-        <a href="#">
-            <img src="https://img.shields.io/badge/Poetry-1.8.2-5119d4" alt="Poetry 1.8.2">
-        </a>
+        <a href="#"><img src="https://img.shields.io/badge/Python-3.10-306998" alt="Python 3.10"></a> <a href="#"><img src="https://img.shields.io/badge/Conda-4.12.0-44903d" alt="Conda 4.12.0"></a> <a href="#"><img src="https://img.shields.io/badge/Poetry-1.8.2-5119d4" alt="Poetry 1.8.2"></a>
     </p>
     <a href="http://b13-explaining-athletes-performance.course-xai-iml24.isginf.ch"><strong>🌐 Check out our website »</strong></a>
 
